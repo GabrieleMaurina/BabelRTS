@@ -17,7 +17,7 @@ class ChangeDiscoverer:
 
     def explore_codebase(self):
         self._test_files = {file for test_folder in self.get_babelrts().get_test_folders() for file in self._find_files(test_folder)}
-        self._source_files = self.get_test_files() - {file for source_folder in self.get_babelrts().get_source_folders() for file in self._find_files(source_folder)}
+        self._source_files = {file for source_folder in self.get_babelrts().get_source_folders() for file in self._find_files(source_folder)} - self.get_test_files()
         self._all_files = self.get_test_files() | self.get_source_files()
 
         old_hashcodes = self._load_hashcodes()

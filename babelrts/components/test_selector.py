@@ -10,7 +10,6 @@ class TestSelector:
         test_files = self.get_babelrts().get_change_discoverer().get_test_files()
         changed_files = self.get_babelrts().get_change_discoverer().get_changed_files()
         dependency_graph = self.get_babelrts().get_dependency_extractor().get_dependency_graph()
-        print(dependency_graph)
         self._selected_tests = {test_file for test_file in test_files if self._dfs_changed(test_file, changed_files, dependency_graph)}
         return self._selected_tests
 

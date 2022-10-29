@@ -90,11 +90,10 @@ class DependencyExtractor:
         extension = extension_pattern_action.extension
         pattern = extension_pattern_action.pattern
         action = extension_pattern_action.action
-
         if extension not in self._patterns_actions:
             self._patterns_actions[extension] = [(pattern, action)]
         else:
-            self._patterns_actions[extension] += (pattern, action)
+            self._patterns_actions[extension].append((pattern, action))
 
     def get_extensions(self):
         return self._patterns_actions.keys()
