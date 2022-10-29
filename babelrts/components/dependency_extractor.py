@@ -42,7 +42,10 @@ class DependencyExtractor:
                 if new_dependencies:
                     if isinstance(new_dependencies, str):
                         new_dependencies = (new_dependencies,)
-                    dependencies.update({path for path in (normpath(relpath(dependency, project_folder) if isabs(dependency) else dependency) for dependency in new_dependencies) if path!=file_path})
+                    #print(type(new_dependencies))
+                    #for d in new_dependencies:
+                    #    print('\t', type(d), d)
+                    dependencies.update(path for path in (normpath(relpath(dependency, project_folder) if isabs(dependency) else normpath(dependency)) for dependency in new_dependencies) if path!=file_path)
         if dependencies:
             self._dependency_graph[file_path] = tuple(dependencies)
 
