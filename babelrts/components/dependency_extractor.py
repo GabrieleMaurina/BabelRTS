@@ -74,6 +74,8 @@ class DependencyExtractor:
 
         if not languages:
             languages = self._language_implementations.keys()
+        if isinstance(languages, str):
+            languages = (languages,)
         self._languages = languages
 
         self._patterns_actions = {}

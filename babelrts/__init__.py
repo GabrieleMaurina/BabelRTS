@@ -16,8 +16,12 @@ class BabelRTS:
     def __init__(self, project_folder='.', source_folders=None, test_folders=None, excluded=(), languages=None, language_implementations=None):
         if not source_folders:
             source_folders = (project_folder,)
+        if isinstance(source_folders, str):
+            source_folders = (source_folders,)
         if not test_folders:
             test_folders = (project_folder,)
+        if isinstance(test_folders, str):
+            test_folders = (test_folders,)
         self._project_folder = normpath(project_folder)
         self._source_folders = {normpath(source_folder) for source_folder in source_folders}
         self._test_folders = {normpath(test_folder) for test_folder in test_folders}
