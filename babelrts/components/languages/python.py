@@ -4,7 +4,7 @@ from babelrts.components.languages.extension_pattern_action import ExtensionPatt
 from re import compile as cmp_re
 from os.path import join
 
-IMPORT_PATTERN = cmp_re(r'([^\S\r\n]*from[^\S\r\n]+(\S+)[^\S\r\n]+)?import[^\S\r\n](\S+)')
+IMPORT_PATTERN = cmp_re(r'(?<!\S)(?:from[^\S\r\n]+(\S+)[^\S\r\n]+)?import[^\S\r\n]+(\S+)')
 
 class Python(Language):
 
@@ -12,7 +12,7 @@ class Python(Language):
         return ExtensionPatternAction('py', IMPORT_PATTERN, self.import_action)
 
     def import_action(self, match, file_path, folder_path, content):
-        name = match[1] if match[1] else match[2]
+        name = match[0] if match[0] else match[1]
         path = name.replace('.', '/')
         if self.is_file(file := path + '.py'):
             return file

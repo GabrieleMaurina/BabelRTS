@@ -2,9 +2,10 @@ from babelrts.components.languages.java import Java
 from babelrts.components.languages.python import Python
 from babelrts.components.languages.javascript import Javascript
 from babelrts.components.languages.typescript import Typescript
+from babelrts.components.languages.extension_pattern_action import ExtensionPatternAction
 
 from collections.abc import Iterable
-from os.path import relpath, normpath, basename, dirname
+from os.path import join, relpath, normpath, isabs, basename, dirname
 
 LANGUAGE_IMPLEMENTATIONS = {'java': Java, 'python': Python, 'javascript': Javascript, 'typescript': Typescript}
 
@@ -19,7 +20,8 @@ class DependencyExtractor:
         all_files = self.get_babelrts().get_change_discoverer().get_all_files()
         extensions = self.get_extensions()
         patterns_actions = self.get_patterns_actions()
-        self._dependency_grap = {}
+        project_folder = self.get_babelrts().get_project_folder()
+        self._dependency_graph = {}
         for file_path in all_files:
             file = basename(file_path)
             folder_path = dirname(file_path)
@@ -27,19 +29,22 @@ class DependencyExtractor:
             if len(split) == 2:
                 name, extension = split
                 if name and extension and extension in extensions:
-                    with open(file_path, 'r', encoding='unicode_escape') as content:
-                        content = content.read()
-                    dependencies = set()
-                    for pattern, action in patterns_actions[extension]:
-                        for match in pattern.findall(content):
-                            new_depenencies = action(match, file_path, folder_path, content)
-                            if new_depenencies:
-                                if isinstance(new_dependencies, str):
-                                    new_depenencies = (new_depenencies,)
-                                dependencies.update({path for path in (normpath(relpath(dependency, project_folder)) for dependency in new_depenencies) if path!=file_path})
-                    if dependencies:
-                        self._dependency_grap[file_path] = tuple(dependencies)
-        return self._dependency_grap
+                    self._collect_dependencies(file_path, folder_path, project_folder, patterns_actions, extension)
+        return self._dependency_graph
+
+    def _collect_dependencies(self, file_path, folder_path, project_folder, patterns_actions, extension):
+        with open(join(project_folder, file_path), 'r', encoding='unicode_escape') as content:
+            content = content.read()
+        dependencies = set()
+        for pattern, action in patterns_actions[extension]:
+            for match in pattern.findall(content):
+                new_dependencies = action(match, file_path, folder_path, content)
+                if new_dependencies:
+                    if isinstance(new_dependencies, str):
+                        new_dependencies = (new_dependencies,)
+                    dependencies.update({path for path in (normpath(relpath(dependency, project_folder) if isabs(dependency) else dependency) for dependency in new_dependencies) if path!=file_path})
+        if dependencies:
+            self._dependency_graph[file_path] = tuple(dependencies)
 
     def get_dependency_graph(self):
         return self._dependency_graph
@@ -75,13 +80,13 @@ class DependencyExtractor:
     def _add_language_implementation(self, language_implementation):
         extensions_patterns_actions = language_implementation(self).get_extensions_patterns_actions()
         if extensions_patterns_actions:
-            if isinstance(extensions_patterns_actions, Iterable):
+            if isinstance(extensions_patterns_actions, ExtensionPatternAction):
+                self._add_extension_pattern_action(extensions_patterns_actions)
+            else:
                 for extension_pattern_action in extensions_patterns_actions:
                     self._add_extension_pattern_action(extension_pattern_action)
-            else:
-                self._add_extension_pattern_action(extensions_patterns_actions)
 
-    def _add_extension_pattern_action(self, extension_pattern_action):
+    def _add_extension_pattern_action(self, extension_pattern_action):    
         extension = extension_pattern_action.extension
         pattern = extension_pattern_action.pattern
         action = extension_pattern_action.action

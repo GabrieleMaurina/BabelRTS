@@ -2,6 +2,7 @@ from os import walk
 from os.path import join
 from json import load, dump
 from hashlib import sha1
+from os.path import relpath, normpath
 
 BABELRTS_FILE = '.babelrts'
 
@@ -15,12 +16,12 @@ class ChangeDiscoverer:
         self._changed_files = None
 
     def explore_codebase(self):
-        self._test_files = {file for test_folder in test_folders for file in self._find_files(test_folder)}
-        self._source_files = self.get_test_files() - {file for source_folder in source_folders for file in self._find_files(source_folder)}
-        self._all_files = self.get_test_files() + self.get_source_files()
+        self._test_files = {file for test_folder in self.get_babelrts().get_test_folders() for file in self._find_files(test_folder)}
+        self._source_files = self.get_test_files() - {file for source_folder in self.get_babelrts().get_source_folders() for file in self._find_files(source_folder)}
+        self._all_files = self.get_test_files() | self.get_source_files()
 
-        old_hashcodes = _self._load_hashcodes()
-        new_hashcodes = {file:self._sha1(file) for file in all_files}
+        old_hashcodes = self._load_hashcodes()
+        new_hashcodes = {file:self._sha1(file) for file in self._all_files}
         self._save_hashcodes(new_hashcodes)
         self._changed_files = {file for file, hash in new_hashcodes.items() if file not in old_hashcodes or new_hashcodes[file] != old_hashcodes[file]}
 
@@ -32,10 +33,10 @@ class ChangeDiscoverer:
         extensions = self.get_babelrts().get_dependency_extractor().get_extensions()
 
         for root, dirs, files in walk(join(project_folder, path)):
-            dirs[:] = [dir for dir in dirs if dir[0] != '.' and dir not in exclude]
+            dirs[:] = [dir for dir in dirs if dir[0] != '.' and dir not in excluded]
             for file in files:
-                if file not in exclude:
-                    file_path = relpath(join(root, file), project_folder)
+                if file not in excluded:
+                    file_path = normpath(relpath(join(root, file), project_folder))
                     split = file.rsplit('.', 1)
                     if len(split) == 2:
                         name, extension = split
