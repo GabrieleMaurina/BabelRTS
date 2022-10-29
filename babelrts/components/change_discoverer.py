@@ -14,7 +14,7 @@ class ChangeDiscoverer:
         self._test_files = None
         self._changed_files = None
 
-    def explore_codebase(self, changed=False):
+    def explore_codebase(self):
         self._test_files = {file for test_folder in test_folders for file in self._find_files(test_folder)}
         self._source_files = self.get_test_files() - {file for source_folder in source_folders for file in self._find_files(source_folder)}
         self._all_files = self.get_test_files() + self.get_source_files()
@@ -22,13 +22,13 @@ class ChangeDiscoverer:
         old_hashcodes = _self._load_hashcodes()
         new_hashcodes = {file:self._sha1(file) for file in all_files}
         self._save_hashcodes(new_hashcodes)
-        self._changed_files = {file for file, hash in new_hashcodes.items() if changed or file not in old_hashcodes or new_hashcodes[file] != old_hashcodes[file]}
+        self._changed_files = {file for file, hash in new_hashcodes.items() if file not in old_hashcodes or new_hashcodes[file] != old_hashcodes[file]}
 
         return self.get_all_files(), self.get_source_files(), self.get_test_files(), self.get_changed_files()
 
     def _find_files(self, path):
         project_folder = self.get_babelrts().get_project_folder()
-        exclude = self.get_babelrts().get_exclude()
+        excluded = self.get_babelrts().get_excluded()
         extensions = self.get_babelrts().get_dependency_extractor().get_extensions()
 
         for root, dirs, files in walk(join(project_folder, path)):

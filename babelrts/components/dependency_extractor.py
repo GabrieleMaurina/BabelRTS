@@ -4,6 +4,7 @@ from babelrts.components.languages.javascript import Javascript
 from babelrts.components.languages.typescript import Typescript
 
 from collections.abc import Iterable
+from os.path import relpath, normpath, basename, dirname
 
 LANGUAGE_IMPLEMENTATIONS = {'java': Java, 'python': Python, 'javascript': Javascript, 'typescript': Typescript}
 
@@ -72,7 +73,7 @@ class DependencyExtractor:
             self._add_language_implementation(language_implementations[language.lower()])
 
     def _add_language_implementation(self, language_implementation):
-        extensions_patterns_actions = language_implementation().get_extensions_patterns_actions()
+        extensions_patterns_actions = language_implementation(self).get_extensions_patterns_actions()
         if extensions_patterns_actions:
             if isinstance(extensions_patterns_actions, Iterable):
                 for extension_pattern_action in extensions_patterns_actions:
@@ -81,9 +82,9 @@ class DependencyExtractor:
                 self._add_extension_pattern_action(extensions_patterns_actions)
 
     def _add_extension_pattern_action(self, extension_pattern_action):
-        extension = extension_pattern_action.get_extension()
-        pattern = extension_pattern_action.get_pattern()
-        action = extension_pattern_action.get_action()
+        extension = extension_pattern_action.extension
+        pattern = extension_pattern_action.pattern
+        action = extension_pattern_action.action
 
         if extension not in self._patterns_actions:
             self._patterns_actions[extension] = [(pattern, action)]
