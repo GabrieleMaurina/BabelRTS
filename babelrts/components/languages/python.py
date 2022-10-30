@@ -11,6 +11,10 @@ class Python(Language):
     def get_extensions_patterns_actions(self):
         return ExtensionPatternAction('py', IMPORT_PATTERN, self.import_action)
 
+    @staticmethod
+    def get_language():
+        return 'python'
+
     def import_action(self, match, file_path, folder_path, content):
         name = match[0] if match[0] else match[1]
         path = name.replace('.', '/')

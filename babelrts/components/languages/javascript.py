@@ -16,6 +16,10 @@ class Javascript(Language):
     def get_extensions_patterns_actions(self):
         return tuple(ExtensionPatternAction('js', pattern, self.import_action) for pattern in PATTERNS)
 
+    @staticmethod
+    def get_language():
+        return 'javascript'
+
     def import_action(self, match, file_path, folder_path, content):
         if match.endswith('.js') or match.endswith('.ts'):
             if self.is_file(file:=join(folder_path, match)):

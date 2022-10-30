@@ -9,3 +9,7 @@ class Typescript(Javascript):
         for javascript_extension_pattern_action in javascript_extensions_patterns_actions:
             extensions_patterns_actions.add(ExtensionPatternAction('ts', javascript_extension_pattern_action.pattern, javascript_extension_pattern_action.action))
         return tuple(extensions_patterns_actions)
+
+    @staticmethod
+    def get_language():
+        return 'typescript'

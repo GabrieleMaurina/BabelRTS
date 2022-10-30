@@ -7,7 +7,7 @@ from babelrts.components.languages.extension_pattern_action import ExtensionPatt
 from collections.abc import Iterable
 from os.path import join, relpath, normpath, isabs, basename, dirname
 
-LANGUAGE_IMPLEMENTATIONS = {'java': Java, 'python': Python, 'javascript': Javascript, 'typescript': Typescript}
+LANGUAGE_IMPLEMENTATIONS = (Java, Python, Javascript, Typescript)
 
 class DependencyExtractor:
 
@@ -62,7 +62,7 @@ class DependencyExtractor:
         return self._languages
 
     def get_language_implementations(self):
-        return self._language_implementations
+        return tuple(self._language_implementations.values())
     
     def get_patterns_actions(self):
         return self._patterns_actions
@@ -70,17 +70,17 @@ class DependencyExtractor:
     def set_languages(self, languages=None, language_implementations=None):
         if not language_implementations:
             language_implementations = LANGUAGE_IMPLEMENTATIONS
-        self._language_implementations = language_implementations
+        self._language_implementations = {language_implementation.get_language():language_implementation for language_implementation in language_implementations}
 
         if not languages:
             languages = self._language_implementations.keys()
-        if isinstance(languages, str):
+        elif isinstance(languages, str):
             languages = (languages,)
         self._languages = languages
 
         self._patterns_actions = {}
         for language in languages:
-            self._add_language_implementation(language_implementations[language.lower()])
+            self._add_language_implementation(self._language_implementations[language.lower()])
 
     def _add_language_implementation(self, language_implementation):
         extensions_patterns_actions = language_implementation(self).get_extensions_patterns_actions()

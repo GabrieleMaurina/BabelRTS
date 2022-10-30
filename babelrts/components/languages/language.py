@@ -21,6 +21,11 @@ class Language(ABC):
     def get_extensions_patterns_actions(self):
         pass
 
+    @staticmethod
+    @abstractmethod
+    def get_language():
+        pass
+
     def get_project_folder(self):
         return self.get_dependency_extractor().get_babelrts().get_project_folder()
 

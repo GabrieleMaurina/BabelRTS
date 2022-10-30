@@ -36,6 +36,10 @@ class Java(Language):
             ExtensionPatternAction('java', CATCH_PATTERN, self.multiple_used_classes_action)
         )
 
+    @staticmethod
+    def get_language():
+        return 'java'
+
     def import_action(self, match, file_path, folder_path, content):
         if match.endswith('*'):
             path = match.replace('.', '/') + '.java'
