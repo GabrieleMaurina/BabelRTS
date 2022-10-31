@@ -1,13 +1,25 @@
-from babelrts.components.languages.java import Java
-from babelrts.components.languages.python import Python
-from babelrts.components.languages.javascript import Javascript
-from babelrts.components.languages.typescript import Typescript
-from babelrts.components.languages.extension_pattern_action import ExtensionPatternAction
+from babelrts.components.dependencies.extension_pattern_action import ExtensionPatternAction
+from babelrts.components.dependencies.languages.c import C
+from babelrts.components.dependencies.languages.c_sharp import CSharp
+from babelrts.components.dependencies.languages.cpp import Cpp
+from babelrts.components.dependencies.languages.erlang import Erlang
+from babelrts.components.dependencies.languages.go import Go
+from babelrts.components.dependencies.languages.groovy import Groovy
+from babelrts.components.dependencies.languages.java import Java
+from babelrts.components.dependencies.languages.javascript import Javascript
+from babelrts.components.dependencies.languages.kotlin import Kotlin
+from babelrts.components.dependencies.languages.php import Php
+from babelrts.components.dependencies.languages.python import Python
+from babelrts.components.dependencies.languages.ruby import Ruby
+from babelrts.components.dependencies.languages.rust import Rust
+from babelrts.components.dependencies.languages.scala import Scala
+from babelrts.components.dependencies.languages.swift import Swift
+from babelrts.components.dependencies.languages.typescript import Typescript
 
 from collections.abc import Iterable
 from os.path import join, relpath, normpath, isabs, basename, dirname
 
-LANGUAGE_IMPLEMENTATIONS = (Java, Python, Javascript, Typescript)
+LANGUAGE_IMPLEMENTATIONS = (C, CSharp, Cpp, Erlang, Go, Groovy, Java, Javascript, Kotlin, Php, Python, Ruby, Rust, Scala, Swift, Typescript)
 
 class DependencyExtractor:
 
@@ -42,9 +54,6 @@ class DependencyExtractor:
                 if new_dependencies:
                     if isinstance(new_dependencies, str):
                         new_dependencies = (new_dependencies,)
-                    #print(type(new_dependencies))
-                    #for d in new_dependencies:
-                    #    print('\t', type(d), d)
                     dependencies.update(path for path in (normpath(relpath(dependency, project_folder) if isabs(dependency) else normpath(dependency)) for dependency in new_dependencies) if path!=file_path)
         if dependencies:
             self._dependency_graph[file_path] = tuple(dependencies)

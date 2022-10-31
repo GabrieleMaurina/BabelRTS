@@ -1,0 +1,16 @@
+import babelrts.components.dependencies.languages.c
+import babelrts.components.dependencies.languages.c_sharp
+import babelrts.components.dependencies.languages.cpp
+import babelrts.components.dependencies.languages.erlang
+import babelrts.components.dependencies.languages.go
+import babelrts.components.dependencies.languages.groovy
+import babelrts.components.dependencies.languages.java
+import babelrts.components.dependencies.languages.javascript
+import babelrts.components.dependencies.languages.kotlin
+import babelrts.components.dependencies.languages.php
+import babelrts.components.dependencies.languages.python
+import babelrts.components.dependencies.languages.ruby
+import babelrts.components.dependencies.languages.rust
+import babelrts.components.dependencies.languages.scala
+import babelrts.components.dependencies.languages.swift
+import babelrts.components.dependencies.languages.typescript

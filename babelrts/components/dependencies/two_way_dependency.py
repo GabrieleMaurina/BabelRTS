@@ -1,0 +1,2 @@
+class TwoWayDependency(str):
+    pass

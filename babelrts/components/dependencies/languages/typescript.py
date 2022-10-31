@@ -1,5 +1,5 @@
-from babelrts.components.languages.javascript import Javascript
-from babelrts.components.languages.extension_pattern_action import ExtensionPatternAction
+from babelrts.components.dependencies.languages.javascript import Javascript
+from babelrts.components.dependencies.extension_pattern_action import ExtensionPatternAction
 
 class Typescript(Javascript):
 
