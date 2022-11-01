@@ -18,9 +18,9 @@ def parse_args():
 def main():
     args = parse_args()
     project_folder = args.p
-    source_folders = {normpath(relpath(source_folder, project_folder)) for source_folder in args.s}
-    test_folders = {normpath(relpath(test_folder, project_folder)) for test_folder in args.t}
-    selected_tests = babelrts.BabelRTS(args.p, source_folders, test_folders, args.e, args.l).rts(args.a)
+    source_folders = {relpath(source_folder, project_folder) for source_folder in args.s}
+    test_folders = {relpath(test_folder, project_folder) for test_folder in args.t}
+    selected_tests = babelrts.BabelRTS(project_folder, source_folders, test_folders, args.e, args.l).rts(args.a)
     for test_file in selected_tests:
         print(test_file)
 

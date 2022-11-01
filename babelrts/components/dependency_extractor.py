@@ -48,8 +48,13 @@ class DependencyExtractor:
         return self._dependency_graph
 
     def _collect_dependencies(self, file_path, folder_path, project_folder, patterns_actions, extension, dependency_graph):
-        with open(join(project_folder, file_path), 'r', encoding='unicode_escape') as content:
-            content = content.read()
+        full_path = join(project_folder, file_path)
+        try:
+            with open(full_path, 'r', encoding='utf-8') as content:
+                content = content.read()
+        except Exception:
+            with open(full_path, 'r', encoding='unicode_escape') as content:
+                content = content.read()
         for pattern, action in patterns_actions[extension]:
             for match in pattern.findall(content):
                 new_dependencies = action(match, file_path, folder_path, content)
