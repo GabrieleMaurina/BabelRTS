@@ -1,4 +1,5 @@
 from babelrts.components.dependencies.extension_pattern_action import ExtensionPatternAction
+from babelrts.components.dependencies.two_way_dependency import TwoWayDependency
 from babelrts.components.dependencies.languages.c import C
 from babelrts.components.dependencies.languages.c_sharp import CSharp
 from babelrts.components.dependencies.languages.cpp import Cpp
@@ -16,6 +17,7 @@ from babelrts.components.dependencies.languages.scala import Scala
 from babelrts.components.dependencies.languages.swift import Swift
 from babelrts.components.dependencies.languages.typescript import Typescript
 
+from collections import defaultdict
 from collections.abc import Iterable
 from os.path import join, relpath, normpath, isabs, basename, dirname
 
@@ -33,7 +35,7 @@ class DependencyExtractor:
         extensions = self.get_extensions()
         patterns_actions = self.get_patterns_actions()
         project_folder = self.get_babelrts().get_project_folder()
-        self._dependency_graph = {}
+        dependency_graph = defaultdict(set)
         for file_path in all_files:
             file = basename(file_path)
             folder_path = dirname(file_path)
@@ -41,22 +43,27 @@ class DependencyExtractor:
             if len(split) == 2:
                 name, extension = split
                 if name and extension and extension in extensions:
-                    self._collect_dependencies(file_path, folder_path, project_folder, patterns_actions, extension)
+                    self._collect_dependencies(file_path, folder_path, project_folder, patterns_actions, extension, dependency_graph)
+        self._dependency_graph = dict(dependency_graph)
         return self._dependency_graph
 
-    def _collect_dependencies(self, file_path, folder_path, project_folder, patterns_actions, extension):
+    def _collect_dependencies(self, file_path, folder_path, project_folder, patterns_actions, extension, dependency_graph):
         with open(join(project_folder, file_path), 'r', encoding='unicode_escape') as content:
             content = content.read()
-        dependencies = set()
         for pattern, action in patterns_actions[extension]:
             for match in pattern.findall(content):
                 new_dependencies = action(match, file_path, folder_path, content)
                 if new_dependencies:
                     if isinstance(new_dependencies, str):
                         new_dependencies = (new_dependencies,)
-                    dependencies.update(path for path in (normpath(relpath(dependency, project_folder) if isabs(dependency) else normpath(dependency)) for dependency in new_dependencies) if path!=file_path)
-        if dependencies:
-            self._dependency_graph[file_path] = tuple(dependencies)
+                    for dependency in new_dependencies:
+                        if isabs(dependency):
+                            dependency = relpath(dependency, project_folder)
+                        dependency = normpath(dependency)
+                        if dependency != file_path:
+                            dependency_graph[file_path].add(dependency)
+                            if isinstance(dependency, TwoWayDependency):
+                                dependency_graph[dependency].add(file_path)
 
     def get_dependency_graph(self):
         return self._dependency_graph
