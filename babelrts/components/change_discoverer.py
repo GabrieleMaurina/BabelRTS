@@ -2,7 +2,8 @@ from os import walk
 from os.path import join
 from json import load, dump
 from hashlib import sha1
-from os.path import relpath, normpath
+from os.path import relpath, normpath, isfile
+from os import remove
 
 BABELRTS_FILE = '.babelrts'
 
@@ -61,6 +62,12 @@ class ChangeDiscoverer:
         project_folder = self.get_babelrts().get_project_folder()
         with open(join(project_folder, BABELRTS_FILE), 'w') as file:
             dump(hashcodes, file, indent=4, sort_keys=True)
+
+    def clear_babelrts_data(self):
+        project_folder = self.get_babelrts().get_project_folder()
+        babelrts_data = join(project_folder, BABELRTS_FILE)
+        if isfile(babelrts_data):
+            remove(babelrts_data)
 
     def get_all_files(self):
         return self._all_files
