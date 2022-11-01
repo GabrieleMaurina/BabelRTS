@@ -7,7 +7,8 @@ class Cpp(C):
         return (
             ExtensionPatternAction('h', INCLUDE_PATTERN, self.include_action),
             ExtensionPatternAction('cpp', INCLUDE_PATTERN, self.include_action),
-            ExtensionPatternAction('hpp', INCLUDE_PATTERN, self.include_action)
+            ExtensionPatternAction('hpp', INCLUDE_PATTERN, self.include_action),
+            ExtensionPatternAction('cc', INCLUDE_PATTERN, self.include_action)
         )
 
     @staticmethod

@@ -23,8 +23,11 @@ class C(Language):
             if self.is_file(file:=join(folder_path, match)):
                 return self.check_two_way(file, file_path)
         else:
-            if self.is_file(match):
-                return self.check_two_way(match, file_path)
+            dependencies = set()
+            for folder in self.get_import_folders():
+                if self.is_file(join(folder, match)):
+                    dependencies.add(self.check_two_way(match, file_path))
+            return dependencies
                     
     def check_two_way(self, match, file_path):
         name = basename(file_path).rsplit('.', 1)[0]
@@ -33,3 +36,7 @@ class C(Language):
             return TwoWayDependency(file)
         else:
             return file
+
+    def get_import_folders(self):
+        babelrts = self.get_dependency_extractor().get_babelrts()
+        return chain(('',), babelrts.get_source_folders(), babelrts.get_test_folders())

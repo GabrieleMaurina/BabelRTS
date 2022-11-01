@@ -14,21 +14,13 @@ __status__ = 'Production'
 class BabelRTS:
 
     def __init__(self, project_folder='.', source_folders=None, test_folders=None, excluded=(), languages=None, language_implementations=None):
-        if not source_folders:
-            source_folders = (project_folder,)
-        if isinstance(source_folders, str):
-            source_folders = (source_folders,)
-        if not test_folders:
-            test_folders = (project_folder,)
-        if isinstance(test_folders, str):
-            test_folders = (test_folders,)
-        self._project_folder = normpath(project_folder)
-        self._source_folders = {normpath(source_folder) for source_folder in source_folders}
-        self._test_folders = {normpath(test_folder) for test_folder in test_folders}
-        self._excluded = excluded
-        self._change_discoverer = babelrts.components.change_discoverer.ChangeDiscoverer(self)
-        self._dependency_extractor = babelrts.components.dependency_extractor.DependencyExtractor(self, languages, language_implementations)
-        self._test_selector = babelrts.components.test_selector.TestSelector(self)
+        self.set_project_folder(project_folder)
+        self.set_source_folders(source_folders)
+        self.set_test_folders(test_folders)
+        self.set_excluded(excluded)
+        self.set_change_discoverer(babelrts.components.change_discoverer.ChangeDiscoverer(self))
+        self.set_dependency_extractor(babelrts.components.dependency_extractor.DependencyExtractor(self, languages, language_implementations))
+        self.set_test_selector(babelrts.components.test_selector.TestSelector(self))
 
     def rts(self, all=False):
         self.get_change_discoverer().explore_codebase()
@@ -47,25 +39,40 @@ class BabelRTS:
         return self._project_folder
 
     def set_project_folder(self, project_folder):
-        self._project_folder = project_folder
+        self._project_folder = normpath(project_folder)
 
     def get_source_folders(self):
         return self._source_folders
 
     def set_source_folders(self, source_folders):
-        self._source_folders = source_folders
+        if not source_folders:
+            self._source_folders = (self.get_project_folder(),)
+        elif isinstance(source_folders, str):
+            self._source_folders = (normpath(source_folders),)
+        else:
+            self._source_folders = tuple(normpath(source_folder) for source_folder in source_folders)
 
     def get_test_folders(self):
         return self._test_folders
 
-    def set_project_folder(self, test_folders):
-        self._test_folders = test_folders
+    def set_test_folders(self, test_folders):
+        if not test_folders:
+            self._test_folders = (self.get_project_folder(),)
+        elif isinstance(test_folders, str):
+            self._test_folders = (normpath(test_folders),)
+        else:
+            self._test_folders = tuple(normpath(test_folder) for test_folder in test_folders)
 
     def get_excluded(self):
         return self._excluded
 
-    def set_project_folder(self, excluded):
-        self._project_folder = excluded
+    def set_excluded(self, excluded):
+        if not excluded:
+            self._excluded = ()
+        elif isinstance(excluded, str):
+            self._excluded = (normpath(excluded),)
+        else:
+            self._excluded = tuple(normpath(path) for path in excluded)
 
     def get_change_discoverer(self):
         return self._change_discoverer
