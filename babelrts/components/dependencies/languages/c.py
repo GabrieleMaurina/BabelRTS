@@ -4,6 +4,7 @@ from babelrts.components.dependencies.two_way_dependency import TwoWayDependency
 
 from re import compile as cmp_re
 from os.path import join, basename
+from itertools import chain
 
 INCLUDE_PATTERN = cmp_re(r'#include (["<].+?[">])')
 
@@ -25,17 +26,17 @@ class C(Language):
         else:
             dependencies = set()
             for folder in self.get_import_folders():
-                if self.is_file(join(folder, match)):
-                    dependencies.add(self.check_two_way(match, file_path))
+                if self.is_file(file:=join(folder, match)):
+                    dependencies.add(self.check_two_way(file, file_path))
             return dependencies
                     
-    def check_two_way(self, match, file_path):
+    def check_two_way(self, dependency, file_path):
         name = basename(file_path).rsplit('.', 1)[0]
-        match_name = basename(match).rsplit('.', 1)[0]
-        if name == match_name:
-            return TwoWayDependency(file)
+        dependency_name = basename(dependency).rsplit('.', 1)[0]
+        if name == dependency_name:
+            return TwoWayDependency(dependency)
         else:
-            return file
+            return dependency
 
     def get_import_folders(self):
         babelrts = self.get_dependency_extractor().get_babelrts()
