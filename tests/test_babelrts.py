@@ -11,7 +11,8 @@ REPOS = (
     'https://github.com/apache/commons-cli.git',
     'https://github.com/dmlc/minerva.git',
     'https://github.com/paramiko/paramiko.git',
-    'https://github.com/vega/datalib.git'
+    'https://github.com/vega/datalib.git',
+    'https://github.com/erlydtl/erlydtl.git',
 )
 
 TEST_INPUTS = (
@@ -19,6 +20,7 @@ TEST_INPUTS = (
     ('repos/minerva', 'minerva', 'tests', 'c++'),
     ('repos/paramiko', 'paramiko', 'tests', 'python'),
     ('repos/datalib', 'src', 'test', 'javascript'),
+    ('repos/erlydtl', 'src', 'test', 'erlang'),
 )
 
 @pytest.fixture(scope='module', autouse=True)
