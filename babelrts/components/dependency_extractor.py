@@ -26,9 +26,9 @@ LANGUAGE_IMPLEMENTATIONS = (C, CSharp, Cpp, Erlang, Go, Groovy, Java, Javascript
 class DependencyExtractor:
 
     def __init__(self, babelrts, languages=None, language_implementations=None):
-        self._babelrts = babelrts
-        self._dependency_graph = None
+        self.set_babelrts(babelrts)
         self.set_languages(languages, language_implementations)
+        self._dependency_graph = None
 
     def generate_dependency_graph(self):
         all_files = self.get_babelrts().get_change_discoverer().get_all_files()

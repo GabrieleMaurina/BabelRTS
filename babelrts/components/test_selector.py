@@ -3,7 +3,7 @@ from collections import deque
 class TestSelector:
 
     def __init__(self, babelrts):
-        self._babelrts = babelrts
+        self.set_babelrts(babelrts)
         self._selected_tests = None
     
     def select_tests(self):

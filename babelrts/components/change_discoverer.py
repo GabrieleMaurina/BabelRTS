@@ -10,7 +10,7 @@ BABELRTS_FILE = '.babelrts'
 class ChangeDiscoverer:
 
     def __init__(self, babelrts):
-        self._babelrts = babelrts
+        self.set_babelrts(babelrts)
         self._all_files = None
         self._source_files = None
         self._test_files = None

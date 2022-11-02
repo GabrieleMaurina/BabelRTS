@@ -26,6 +26,9 @@ class Language(ABC):
     def get_language():
         pass
 
+    def get_additional_dependencies(self):
+        return None
+
     def get_project_folder(self):
         return self.get_dependency_extractor().get_babelrts().get_project_folder()
 
