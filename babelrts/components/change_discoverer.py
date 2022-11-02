@@ -81,6 +81,9 @@ class ChangeDiscoverer:
     def get_changed_files(self):
         return self._changed_files
 
+    def set_changed_files(self, changed_files):
+        self._changed_files = changed_files
+
     def get_babelrts(self):
         return self._babelrts
 
