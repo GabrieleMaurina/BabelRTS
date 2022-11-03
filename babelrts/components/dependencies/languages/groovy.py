@@ -4,7 +4,7 @@ from babelrts.components.dependencies.extension_pattern_action import ExtensionP
 class Groovy(Language):
 
     def get_extensions_patterns_actions(self):
-        return ()
+        return self.get_token_extension_patterns_actions(('groovy', 'gvy', 'gy', 'gsh'),('import','extends','implements','new'))
 
     @staticmethod
     def get_language():
