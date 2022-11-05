@@ -1,10 +1,12 @@
-from babelrts.components.dependencies.language import Language
-from babelrts.components.dependencies.extension_pattern_action import ExtensionPatternAction
+from babelrts.components.dependencies.token_language import TokenLanguage
 
-class Rust(Language):
+class Rust(TokenLanguage):
 
-    def get_extensions_patterns_actions(self):
-        return self.get_token_extension_patterns_actions(('rs',),('include','use'))
+    def get_extensions(self):
+        return 'rs'
+
+    def get_tokens(self):
+        return ('include','use')
 
     @staticmethod
     def get_language():

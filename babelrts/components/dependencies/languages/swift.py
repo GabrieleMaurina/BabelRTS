@@ -1,10 +1,12 @@
-from babelrts.components.dependencies.language import Language
-from babelrts.components.dependencies.extension_pattern_action import ExtensionPatternAction
+from babelrts.components.dependencies.token_language import TokenLanguage
 
-class Swift(Language):
+class Swift(TokenLanguage):
 
-    def get_extensions_patterns_actions(self):
-        return self.get_token_extension_patterns_actions(('swift',),('import',))
+    def get_extensions(self):
+        return 'swift'
+
+    def get_tokens(self):
+        return 'import'
 
     @staticmethod
     def get_language():

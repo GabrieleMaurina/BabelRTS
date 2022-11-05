@@ -17,14 +17,14 @@ class ChangeDiscoverer:
         self._changed_files = None
 
     def explore_codebase(self):
-        self._test_files = {file for test_folder in self.get_babelrts().get_test_folders() for file in self._find_files(test_folder)}
-        self._source_files = {file for source_folder in self.get_babelrts().get_source_folders() for file in self._find_files(source_folder)} - self.get_test_files()
-        self._all_files = self.get_test_files() | self.get_source_files()
+        self.set_test_files({file for test_folder in self.get_babelrts().get_test_folders() for file in self._find_files(test_folder)})
+        self.set_source_files({file for source_folder in self.get_babelrts().get_source_folders() for file in self._find_files(source_folder)} - self.get_test_files())
+        self.set_all_files(self.get_test_files() | self.get_source_files())
 
         old_hashcodes = self._load_hashcodes()
         new_hashcodes = {file:self._sha1(file) for file in self._all_files}
         self._save_hashcodes(new_hashcodes)
-        self._changed_files = {file for file, hash in new_hashcodes.items() if file not in old_hashcodes or new_hashcodes[file] != old_hashcodes[file]}
+        self.set_changed_files({file for file, hash in new_hashcodes.items() if file not in old_hashcodes or new_hashcodes[file] != old_hashcodes[file]})
 
         return self.get_all_files(), self.get_source_files(), self.get_test_files(), self.get_changed_files()
 
@@ -72,11 +72,20 @@ class ChangeDiscoverer:
     def get_all_files(self):
         return self._all_files
 
+    def set_all_files(self, all_files):
+        self._all_files = all_files
+
     def get_source_files(self):
         return self._source_files
 
+    def set_source_files(self, source_files):
+        self._source_files = source_files
+
     def get_test_files(self):
         return self._test_files
+
+    def set_test_files(self, test_files):
+        self._test_files = test_files
 
     def get_changed_files(self):
         return self._changed_files

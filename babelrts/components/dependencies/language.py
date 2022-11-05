@@ -3,10 +3,6 @@ from babelrts.components.dependencies.extension_pattern_action import ExtensionP
 from abc import ABC, abstractmethod
 from os.path import join, isfile, isdir
 from glob import glob
-from re import compile as cmp_re
-
-TOKEN_PATTERN = '(?<!\S)(?:{})(.+)'
-SPLIT_PATTERN = cmp_re(r'\W+')
 
 class Language(ABC):
 
@@ -31,22 +27,6 @@ class Language(ABC):
     @abstractmethod
     def get_language():
         pass
-
-    def get_token_extension_patterns_actions(self, extensions, tokens):
-        return tuple(ExtensionPatternAction(extension, self.get_pattern_for_tokens(tokens), self.token_action) for extension in extensions)
-
-    def token_action(self, match, file_path, folder_path, content):
-        dependencies = set()
-        for token in SPLIT_PATTERN.split(match):
-            token = token.lower()
-            for file in self.get_dependency_extractor().get_babelrts().get_change_discoverer().get_all_files():
-                name = basename(file).rsplit('.', 1)[0].lower()
-                if name == token:
-                    dependencies.add(file)
-        return dependencies
-
-    def get_pattern_for_tokens(self, tokens):
-        return cmp_re(TOKEN_PATTERN.format('|'.join(tokens)))
 
     def get_additional_dependencies(self):
         return None

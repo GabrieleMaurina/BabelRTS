@@ -44,8 +44,8 @@ class DependencyExtractor:
                 name, extension = split
                 if name and extension and extension in extensions:
                     self._collect_dependencies(file_path, folder_path, project_folder, patterns_actions, extension, dependency_graph)
-        self._dependency_graph = dict(dependency_graph)
-        return self._dependency_graph
+        self.set_dependency_graph(dict(dependency_graph))
+        return self.get_dependency_graph()
 
     def _collect_dependencies(self, file_path, folder_path, project_folder, patterns_actions, extension, dependency_graph):
         full_path = join(project_folder, file_path)
@@ -72,6 +72,9 @@ class DependencyExtractor:
 
     def get_dependency_graph(self):
         return self._dependency_graph
+
+    def set_dependency_graph(self, dependency_graph):
+        self._dependency_graph = dependency_graph
 
     def get_babelrts(self):
         return self._babelrts

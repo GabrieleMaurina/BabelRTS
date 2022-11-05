@@ -10,8 +10,8 @@ class TestSelector:
         test_files = self.get_babelrts().get_change_discoverer().get_test_files()
         changed_files = self.get_babelrts().get_change_discoverer().get_changed_files()
         dependency_graph = self.get_babelrts().get_dependency_extractor().get_dependency_graph()
-        self._selected_tests = {test_file for test_file in test_files if self._dfs_changed(test_file, changed_files, dependency_graph)}
-        return self._selected_tests
+        self.set_selected_tests({test_file for test_file in test_files if self._dfs_changed(test_file, changed_files, dependency_graph)})
+        return self.get_selected_tests()
 
     def _dfs_changed(self, test_file, changed_files, dependency_graph):
         files = deque((test_file,))
@@ -28,6 +28,9 @@ class TestSelector:
 
     def get_selected_tests(self):
         return self._selected_tests
+
+    def set_selected_tests(self, selected_tests):
+        self._selected_tests = selected_tests
 
     def get_babelrts(self):
         return self._babelrts

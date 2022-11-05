@@ -1,10 +1,12 @@
-from babelrts.components.dependencies.languages.java import Java
-from babelrts.components.dependencies.extension_pattern_action import ExtensionPatternAction
+from babelrts.components.dependencies.token_language import TokenLanguage
 
-class Scala(Java):
+class Scala(TokenLanguage):
 
-    def get_extensions_patterns_actions(self):
-        return self.get_token_extension_patterns_actions(('scala',),('import','new','extends'))
+    def get_extensions(self):
+        return 'scala'
+
+    def get_tokens(self):
+        return ('import','new','extends')
 
     @staticmethod
     def get_language():
