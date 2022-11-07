@@ -72,7 +72,6 @@ class DependencyExtractor:
                 if name and extension and extension in extensions:
                     self._collect_dependencies(file_path, folder_path, project_folder, patterns_actions, extension, dependency_graph)
         self.set_dependency_graph(dict(dependency_graph))
-        #self.visualize_digraph()
         return self.get_dependency_graph()
 
     def _collect_dependencies(self, file_path, folder_path, project_folder, patterns_actions, extension, dependency_graph):
@@ -155,14 +154,27 @@ class DependencyExtractor:
     def get_extensions(self):
         return self._patterns_actions.keys()
 
-    def visualize_digraph(self):
-        name = basename(self.get_babelrts().get_project_folder())
-        self.generate_digraph().render(filename=name, format='pdf', cleanup=True)
+    def visualize_digraph(self, **kwargs):
+        if 'filename' not in kwargs:
+            kwargs['filename'] = basename(self.get_babelrts().get_project_folder())
+        if 'format' not in kwargs:
+            kwargs['format'] = 'pdf'
+        if 'engine' not in kwargs:
+            kwargs['engine'] = 'fdp'
+        if 'cleanup' not in kwargs:
+            kwargs['cleanup'] = True
+        self.generate_digraph().render(**kwargs)
 
-    def generate_digraph(self):
+    def generate_digraph(self, short_names=True):
+        if not self.get_dependency_graph():
+            self.generate_dependency_graph()
         g = Digraph()
-        for f1, dependencies in self._dependency_graph.items():
+        for f1, dependencies in self.get_dependency_graph().items():
+            if short_names:
+                f1 = basename(f1)
             g.node(f1)
             for f2 in dependencies:
+                if short_names:
+                    f2 = basename(f2)
                 g.edge(f1, f2)
         return g

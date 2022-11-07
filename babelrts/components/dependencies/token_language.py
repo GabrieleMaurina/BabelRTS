@@ -3,6 +3,7 @@ from babelrts.components.dependencies.extension_pattern_action import ExtensionP
 
 from abc import abstractmethod
 from re import compile as cmp_re
+from os.path import basename
 
 TOKEN_PATTERN = r'(?<!\S)(?:{})(.+)'
 SPLIT_PATTERN = cmp_re(r'\W+')
@@ -20,7 +21,7 @@ class TokenLanguage(Language):
     def get_extensions_patterns_actions(self):
         return self.get_token_extensions_patterns_actions(self.get_extensions(),self.get_tokens())
 
-    def get_token_extension_patterns_actions(self, extensions, tokens):
+    def get_token_extensions_patterns_actions(self, extensions, tokens):
         if isinstance(extensions, str):
             extensions = (extensions,)
         if isinstance(tokens, str):
