@@ -1,27 +1,53 @@
 from babelrts.components.dependencies.extension_pattern_action import ExtensionPatternAction
 from babelrts.components.dependencies.two_way_dependency import TwoWayDependency
+
+from babelrts.components.dependencies.languages.ada import Ada 
+from babelrts.components.dependencies.languages.asp import Asp
+from babelrts.components.dependencies.languages.autohotkey import AutoHotkey
+from babelrts.components.dependencies.languages.autoit import AutoIt
 from babelrts.components.dependencies.languages.c import C
 from babelrts.components.dependencies.languages.c_sharp import CSharp
+from babelrts.components.dependencies.languages.cobol import Cobol
+from babelrts.components.dependencies.languages.cobra import Cobra
 from babelrts.components.dependencies.languages.cpp import Cpp
+from babelrts.components.dependencies.languages.d import D
+from babelrts.components.dependencies.languages.dart import Dart
 from babelrts.components.dependencies.languages.erlang import Erlang
+from babelrts.components.dependencies.languages.fortran import Fortran
 from babelrts.components.dependencies.languages.go import Go
 from babelrts.components.dependencies.languages.groovy import Groovy
+from babelrts.components.dependencies.languages.haskell import Haskell
 from babelrts.components.dependencies.languages.java import Java
 from babelrts.components.dependencies.languages.javascript import Javascript
 from babelrts.components.dependencies.languages.kotlin import Kotlin
+from babelrts.components.dependencies.languages.lua import Lua
+from babelrts.components.dependencies.languages.matlab import MatLab
+from babelrts.components.dependencies.languages.objective_c import ObjectiveC
+from babelrts.components.dependencies.languages.ocaml import Ocaml
+from babelrts.components.dependencies.languages.pascal import Pascal
+from babelrts.components.dependencies.languages.pearl import Pearl
 from babelrts.components.dependencies.languages.php import Php
+from babelrts.components.dependencies.languages.prolog import Prolog
 from babelrts.components.dependencies.languages.python import Python
+from babelrts.components.dependencies.languages.r import R
+from babelrts.components.dependencies.languages.red import Red
 from babelrts.components.dependencies.languages.ruby import Ruby
 from babelrts.components.dependencies.languages.rust import Rust
 from babelrts.components.dependencies.languages.scala import Scala
+from babelrts.components.dependencies.languages.standard_ml import StandardML
+from babelrts.components.dependencies.languages.swi_prolog import SwiProlog
 from babelrts.components.dependencies.languages.swift import Swift
 from babelrts.components.dependencies.languages.typescript import Typescript
+from babelrts.components.dependencies.languages.visual_basic import VisualBasic
 
 from collections import defaultdict
 from collections.abc import Iterable
 from os.path import join, relpath, normpath, isabs, basename, dirname
 
-LANGUAGE_IMPLEMENTATIONS = (C, CSharp, Cpp, Erlang, Go, Groovy, Java, Javascript, Kotlin, Php, Python, Ruby, Rust, Scala, Swift, Typescript)
+LANGUAGE_IMPLEMENTATIONS = (Ada, Asp, AutoHotkey, AutoIt, C, CSharp, Cobol,
+    Cobra, Cpp, D, Dart, Erlang, Fortran, Go, Groovy, Haskell, Java, Javascript,
+    Kotlin, Lua, MatLab, ObjectiveC, Ocaml, Pascal, Pearl, Php, Prolog, Python,
+    R, Red, Ruby, Rust, Scala, StandardML, SwiProlog, Swift, Typescript, VisualBasic)
 
 class DependencyExtractor:
 
