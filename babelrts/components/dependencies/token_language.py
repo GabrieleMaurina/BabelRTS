@@ -4,7 +4,7 @@ from babelrts.components.dependencies.extension_pattern_action import ExtensionP
 from abc import abstractmethod
 from re import compile as cmp_re
 
-TOKEN_PATTERN = '(?<!\S)(?:{})(.+)'
+TOKEN_PATTERN = r'(?<!\S)(?:{})(.+)'
 SPLIT_PATTERN = cmp_re(r'\W+')
 
 class TokenLanguage(Language):
