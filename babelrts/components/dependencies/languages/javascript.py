@@ -25,11 +25,8 @@ class Javascript(Language):
             if self.is_file(file:=join(folder_path, match)):
                 return file
         else:
-            try:
-                deps = set()
-                for file in chain(self.expand(join(folder_path, match) + '*'), self.expand(join(folder_path, match, '*'))):
-                    if self.is_file(file) and (file.endswith('.js') or file.endswith('.ts')):
-                        deps.add(file)
-                return deps
-            except Exception:
-                pass
+            deps = set()
+            for file in chain(self.expand(join(folder_path, match) + '*'), self.expand(join(folder_path, match, '*'))):
+                if self.is_file(file) and (file.endswith('.js') or file.endswith('.ts')):
+                    deps.add(file)
+            return deps

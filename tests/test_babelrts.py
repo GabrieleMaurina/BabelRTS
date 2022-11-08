@@ -36,6 +36,10 @@ def test_babelrts(project_folder, source_folders, test_folders, languages):
     babelRTS = BabelRTS(project_folder, source_folders, test_folders, languages=languages)
     babelRTS.get_change_discoverer().clear_babelrts_data()
     selected_tests = babelRTS.rts()
+    dependency_graph = babelRTS.get_dependency_extractor().get_dependency_graph()
     assert len(selected_tests) > 0
+    assert len(dependency_graph) > 0
     selected_tests = babelRTS.rts()
+    dependency_graph = babelRTS.get_dependency_extractor().get_dependency_graph()
     assert len(selected_tests) == 0
+    assert len(dependency_graph) > 0

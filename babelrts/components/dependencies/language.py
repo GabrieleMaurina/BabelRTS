@@ -1,7 +1,7 @@
 from babelrts.components.dependencies.extension_pattern_action import ExtensionPatternAction
 
 from abc import ABC, abstractmethod
-from os.path import join, isfile, isdir
+from os.path import join, isfile, isdir, relpath, normpath
 from glob import glob
 
 class Language(ABC):
@@ -10,14 +10,16 @@ class Language(ABC):
         self._dependency_extractor = dependency_extractor
 
     def is_file(self, path):
-        return isfile(join(self.get_project_folder(), path))
+        return isfile(join(self.get_project_folder(), normpath(path)))
 
     def is_dir(self, path):
-        return isdir(join(self.get_project_folder(), path))
+        return isdir(join(self.get_project_folder(), normpath(path)))
         
     def expand(self, path):
-        for value in glob(join(self.get_project_folder(), path)):
-            yield value
+        #print(normpath(path))
+        project_folder = self.get_project_folder()
+        for value in glob(join(project_folder, normpath(path))):
+            yield relpath(value, project_folder)
 
     @abstractmethod
     def get_extensions_patterns_actions(self):
