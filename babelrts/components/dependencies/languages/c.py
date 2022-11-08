@@ -6,7 +6,7 @@ from re import compile as cmp_re
 from os.path import join, basename
 from itertools import chain
 
-INCLUDE_PATTERN = cmp_re(r'#include (["<].+?[">])')
+INCLUDE_PATTERN = cmp_re(r'#include\s*["<](\S+?)[">]')
 
 class C(Language):
 
@@ -18,17 +18,11 @@ class C(Language):
         return 'c'
 
     def include_action(self, match, file_path, folder_path, content):
-        quotes = match[0] == '"'
-        match = match[1:-1]
-        if quotes:
-            if self.is_file(file:=join(folder_path, match)):
-                return self.check_two_way(file, file_path)
-        else:
-            dependencies = set()
-            for folder in self.get_import_folders():
-                if self.is_file(file:=join(folder, match)):
-                    dependencies.add(self.check_two_way(file, file_path))
-            return dependencies
+        dependencies = set()
+        for folder in self.get_import_folders():
+            if self.is_file(file:=join(folder, match)):
+                dependencies.add(self.check_two_way(file, file_path))
+        return dependencies
                     
     def check_two_way(self, dependency, file_path):
         name = basename(file_path).rsplit('.', 1)[0]
@@ -40,4 +34,4 @@ class C(Language):
 
     def get_import_folders(self):
         babelrts = self.get_dependency_extractor().get_babelrts()
-        return chain(('',), babelrts.get_source_folders(), babelrts.get_test_folders())
+        return chain(('', self.get_project_folder()), babelrts.get_source_folders(), babelrts.get_test_folders())

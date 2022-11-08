@@ -28,7 +28,8 @@ def clone_repos():
     makedirs(PATH, exist_ok=True)
     for repo in REPOS:
         name = repo.rsplit('/', 1)[-1][:-4]
-        if not isdir(join(PATH, name)):
+        repo_path = join(PATH, name)
+        if not isdir(repo_path):
             run(f'git clone {repo}', shell=True, cwd=PATH)
 
 @pytest.mark.parametrize('project_folder, source_folders, test_folders, languages', TEST_INPUTS)

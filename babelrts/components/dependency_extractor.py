@@ -168,17 +168,24 @@ class DependencyExtractor:
             kwargs['cleanup'] = True
         if 'quiet' not in kwargs:
             kwargs['quiet'] = True
-        self.generate_digraph().render(**kwargs)
+        if 'short_names' in kwargs:
+            short_names = kwargs['short_names']
+            del kwargs['short_names']
+        else:
+            short_names = False
+        self.generate_digraph(short_names).render(**kwargs)
 
     def generate_digraph(self, short_names=True):
         if self.get_dependency_graph() is None:
             self.generate_dependency_graph()
         g = Digraph()
         for f1, dependencies in self.get_dependency_graph().items():
+            f1 = f1.replace('\\','/')
             if short_names:
                 f1 = basename(f1)
             g.node(f1)
             for f2 in dependencies:
+                f2 = f2.replace('\\','/')
                 if short_names:
                     f2 = basename(f2)
                 g.edge(f1, f2)
