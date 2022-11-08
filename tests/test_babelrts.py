@@ -13,6 +13,9 @@ REPOS = (
     'https://github.com/paramiko/paramiko.git',
     'https://github.com/vega/datalib.git',
     'https://github.com/erlydtl/erlydtl.git',
+    'https://github.com/gitbucket/gitbucket.git',
+    'https://github.com/AFNetworking/AFNetworking.git',
+    'https://github.com/Moya/Moya.git',
 )
 
 TEST_INPUTS = (
@@ -21,6 +24,9 @@ TEST_INPUTS = (
     ('repos/paramiko', 'paramiko', 'tests', 'python'),
     ('repos/datalib', 'src', 'test', 'javascript'),
     ('repos/erlydtl', 'src', 'test', 'erlang'),
+    ('repos/gitbucket', 'src/main/scala', 'src/test/scala', 'scala'),
+    ('repos/AFNetworking', 'AFNetworking', 'Tests', 'objective-c'),
+    ('repos/Moya', 'Sources', 'Tests', 'swift'),
 )
 
 @pytest.fixture(scope='module', autouse=True)

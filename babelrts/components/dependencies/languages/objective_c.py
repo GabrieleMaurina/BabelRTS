@@ -6,8 +6,8 @@ class ObjectiveC(TokenLanguage):
         return ('h','m','mm','M')
 
     def get_tokens(self):
-        return ('import','#include')
+        return ('#import','#include')
 
     @staticmethod
     def get_language():
-        return 'objectivec'
+        return 'objective-c'

@@ -10,4 +10,4 @@ class StandardML(TokenLanguage):
 
     @staticmethod
     def get_language():
-        return 'standardml'
+        return 'standard-ml'

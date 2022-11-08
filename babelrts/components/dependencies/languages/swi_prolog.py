@@ -4,4 +4,4 @@ class SwiProlog(Prolog):
 
     @staticmethod
     def get_language():
-        return 'swiprolog'
+        return 'swi-prolog'

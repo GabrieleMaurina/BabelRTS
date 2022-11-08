@@ -10,4 +10,4 @@ class VisualBasic(TokenLanguage):
 
     @staticmethod
     def get_language():
-        return 'visualbasic'
+        return 'visual-basic'
