@@ -28,7 +28,14 @@ def main():
     if args.g is None:
         babelRTS.get_dependency_extractor().visualize_digraph()
     elif args.g:
-        babelRTS.get_dependency_extractor().visualize_digraph(filename=args.g)
+        if '.' in args.g:
+            name, extension = args.g.rsplit('.', 1)
+            if name and extension:
+                babelRTS.get_dependency_extractor().visualize_digraph(filename=name, format=extension)
+            else:
+                babelRTS.get_dependency_extractor().visualize_digraph(filename=args.g)
+        else:
+            babelRTS.get_dependency_extractor().visualize_digraph(filename=args.g)
 
 if __name__ == '__main__':
     main()

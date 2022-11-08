@@ -158,7 +158,7 @@ class DependencyExtractor:
         if 'filename' not in kwargs:
             name = basename(self.get_babelrts().get_project_folder())
             if name == '.' or name == '':
-                name = 'dependency_graph'
+                name = 'digraph'
             kwargs['filename'] = name
         if 'format' not in kwargs:
             kwargs['format'] = 'pdf'
@@ -170,16 +170,23 @@ class DependencyExtractor:
             kwargs['quiet'] = True
         self.generate_digraph().render(**kwargs)
 
-    def generate_digraph(self, short_names=True):
+    def generate_digraph(self, short_names=False):
         if not self.get_dependency_graph():
             self.generate_dependency_graph()
         g = Digraph()
+        n = set()
         for f1, dependencies in self.get_dependency_graph().items():
             if short_names:
                 f1 = basename(f1)
             g.node(f1)
+            n.add(f1)
             for f2 in dependencies:
                 if short_names:
                     f2 = basename(f2)
                 g.edge(f1, f2)
+                n.add(f2)
+        remaining = self.get_babelrts().get_change_discoverer().get_all_files() - n
+        print(len(remaining), len(n))
+        for f in remaining:
+            print(f)
         return g

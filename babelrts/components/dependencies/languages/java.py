@@ -2,7 +2,7 @@ from babelrts.components.dependencies.language import Language
 from babelrts.components.dependencies.extension_pattern_action import ExtensionPatternAction
 
 from re import compile as cmp_re
-from os.path import join
+from os.path import join, relpath, normpath
 
 IMPORT_PATTERN = cmp_re(r'(?<!\S)import\s+(\S+)\s*;')
 IMPORT_STATIC_PATTERN = cmp_re(r'(?<!\S)import\s+static\s+(\S+)\s*;')
@@ -15,7 +15,7 @@ ANNOTATION_PATTERN = cmp_re(r'(?<!\S)@(\S+)(?:\s*\()?')
 THROWS_PATTERN = cmp_re(r'(?<!\S)throws\s+([\s\S]+?)\s*{')
 CATCH_PATTERN = cmp_re(r'(?<!\S)catch\s*\(\s*([\s\S]+?)\s*\S+\)')
 
-SPLIT = cmp_re(r',|\|')
+SPLIT = cmp_re(r',|\||\n')
 
 SRC_FOLDER = 'src/main/java/'
 TEST_FOLDER = 'src/test/java/'
@@ -26,7 +26,7 @@ class Java(Language):
         return (
             ExtensionPatternAction('java', IMPORT_PATTERN, self.import_action),
             ExtensionPatternAction('java', IMPORT_STATIC_PATTERN, self.import_static_action),
-            ExtensionPatternAction('java', PACKAGE_PATTERN, self.package_action),
+            #ExtensionPatternAction('java', PACKAGE_PATTERN, self.package_action),
             ExtensionPatternAction('java', EXTENDS_PATTERN, self.multiple_used_classes_action),
             ExtensionPatternAction('java', IMPLEMENTS_PATTERN, self.multiple_used_classes_action),
             ExtensionPatternAction('java', NEW_PATTERN, self.used_class_action),
@@ -45,22 +45,27 @@ class Java(Language):
             path = match.replace('.', '/') + '.java'
             return (file for folder in FOLDERS for file in self.expand(join(folder, path)))
         else:
-            return self.class_to_files(match)
+            return self.class_to_files(match, folder_path)
 
     def import_static_action(self, match, file_path, folder_path, content):
         match = match.rsplit('.', 1)[0]
-        return self.class_to_files(match)
+        return self.class_to_files(match, folder_path)
 
     def package_action(self, match, file_path, folder_path, content):
         return (file for folder in FOLDERS for file in self.expand(join(folder_path, '*.java')))
 
     def used_class_action(self, match, file_path, folder_path, content):
-        return self.class_to_files(match)
+        return self.class_to_files(match, folder_path)
 
     def multiple_used_classes_action(self, match, file_path, folder_path, content):
         clazzes = (clazz for clazz in (v.strip() for v in SPLIT.split(match)) if clazz)
-        return (file for clazz in clazzes for file in self.class_to_files(clazz))
+        return (file for clazz in clazzes for file in self.class_to_files(clazz, folder_path))
 
-    def class_to_files(self, clazz):
+    def class_to_files(self, clazz, folder_path):
         clazz = clazz.replace('.', '/') + '.java'
-        return (path for path in (join(folder, clazz) for folder in FOLDERS) if self.is_file(path))
+        folder_path = normpath(folder_path)
+        if folder_path.startswith(SRC_FOLDER):
+            other_path = join(TEST_FOLDER, relpath(folder_path, SRC_FOLDER))
+        else:
+            other_path = join(SRC_FOLDER, relpath(folder_path, TEST_FOLDER))
+        return (path for path in (join(folder, clazz) for folder in FOLDERS + (folder_path, other_path)) if self.is_file(path))
