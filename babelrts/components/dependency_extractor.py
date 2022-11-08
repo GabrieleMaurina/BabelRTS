@@ -156,13 +156,18 @@ class DependencyExtractor:
 
     def visualize_digraph(self, **kwargs):
         if 'filename' not in kwargs:
-            kwargs['filename'] = basename(self.get_babelrts().get_project_folder())
+            name = basename(self.get_babelrts().get_project_folder())
+            if name == '.' or name == '':
+                name = 'dependency_graph'
+            kwargs['filename'] = name
         if 'format' not in kwargs:
             kwargs['format'] = 'pdf'
         if 'engine' not in kwargs:
             kwargs['engine'] = 'fdp'
         if 'cleanup' not in kwargs:
             kwargs['cleanup'] = True
+        if 'quiet' not in kwargs:
+            kwargs['quiet'] = True
         self.generate_digraph().render(**kwargs)
 
     def generate_digraph(self, short_names=True):
