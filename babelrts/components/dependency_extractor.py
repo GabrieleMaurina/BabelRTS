@@ -71,6 +71,7 @@ class DependencyExtractor:
                 name, extension = split
                 if name and extension and extension in extensions:
                     self._collect_dependencies(file_path, folder_path, project_folder, patterns_actions, extension, dependency_graph)
+        self._add_additional_dependencies(dependency_graph, project_folder)
         self.set_dependency_graph(dict(dependency_graph))
         return self.get_dependency_graph()
 
@@ -97,6 +98,21 @@ class DependencyExtractor:
                             if isinstance(dependency, TwoWayDependency):
                                 dependency_graph[dependency].add(file_path)
 
+    def _add_additional_dependencies(self, dependency_graph, project_folder):
+        for language_implementation_object in self.get_language_implementation_objects():
+            additional_dependencies = language_implementation_object.get_additional_dependencies()
+            if additional_dependencies:
+                for file, dependencies in additional_dependencies.items():
+                    if isabs(file):
+                        file = relpath(file, project_folder)
+                    file = normpath(file)
+                    for dependency in dependencies:
+                        if isabs(dependency):
+                            dependency = relpath(dependency, project_folder)
+                        dependency = normpath(dependency)
+                        if dependency != file:
+                            dependency_graph[file].add(dependency)
+
     def get_dependency_graph(self):
         return self._dependency_graph
 
@@ -114,9 +130,12 @@ class DependencyExtractor:
 
     def get_language_implementations(self):
         return tuple(self._language_implementations.values())
-    
+
     def get_patterns_actions(self):
         return self._patterns_actions
+
+    def get_language_implementation_objects(self):
+        return self._language_implementation_objects
 
     def set_languages(self, languages=None, language_implementations=None):
         if not language_implementations:
@@ -130,11 +149,14 @@ class DependencyExtractor:
         self._languages = languages
 
         self._patterns_actions = {}
+        self._language_implementation_objects = []
         for language in languages:
             self._add_language_implementation(self._language_implementations[language.lower()])
 
     def _add_language_implementation(self, language_implementation):
-        extensions_patterns_actions = language_implementation(self).get_extensions_patterns_actions()
+        language_implementation_object = language_implementation(self)
+        self._language_implementation_objects.append(language_implementation_object)
+        extensions_patterns_actions = language_implementation_object.get_extensions_patterns_actions()
         if extensions_patterns_actions:
             if isinstance(extensions_patterns_actions, ExtensionPatternAction):
                 self._add_extension_pattern_action(extensions_patterns_actions)
