@@ -1,4 +1,4 @@
-from babelrts.components.dependencies.languages import Ruby
+from babelrts.components.dependencies.languages.ruby import Ruby
 
 class JRuby(Ruby):
 
