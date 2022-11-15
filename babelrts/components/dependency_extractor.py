@@ -1,7 +1,7 @@
 from babelrts.components.dependencies.extension_pattern_action import ExtensionPatternAction
 from babelrts.components.dependencies.two_way_dependency import TwoWayDependency
 
-from babelrts.components.dependencies.languages.ada import Ada 
+from babelrts.components.dependencies.languages.ada import Ada
 from babelrts.components.dependencies.languages.asp import Asp
 from babelrts.components.dependencies.languages.autohotkey import AutoHotkey
 from babelrts.components.dependencies.languages.autoit import AutoIt
@@ -76,14 +76,23 @@ class DependencyExtractor:
         self.set_dependency_graph(dict(dependency_graph))
         return self.get_dependency_graph()
 
+    def safe_read(self, file):
+        try:
+            with open(file, 'r') as content:
+                return content.read()
+        except Exception:
+            encodings = ('utf8', 'unicode_escape', 'ascii', 'cp932')
+            for encoding in encodings:
+                try:
+                    with open(file, 'r', encoding=encoding) as content:
+                        return content.read()
+                except Exception:
+                    pass
+        raise UnicodeError(f'Unable to read {file}')
+
     def _collect_dependencies(self, file_path, folder_path, project_folder, patterns_actions, extension, dependency_graph):
         full_path = join(project_folder, file_path)
-        try:
-            with open(full_path, 'r', encoding='utf-8') as content:
-                content = content.read()
-        except Exception:
-            with open(full_path, 'r', encoding='unicode_escape') as content:
-                content = content.read()
+        content = self.safe_read(full_path)
         for pattern, action in patterns_actions[extension]:
             for match in pattern.findall(content):
                 new_dependencies = action(match, file_path, folder_path, content)
@@ -167,7 +176,7 @@ class DependencyExtractor:
                 for extension_pattern_action in extensions_patterns_actions:
                     self._add_extension_pattern_action(extension_pattern_action)
 
-    def _add_extension_pattern_action(self, extension_pattern_action):    
+    def _add_extension_pattern_action(self, extension_pattern_action):
         extension = extension_pattern_action.extension
         pattern = extension_pattern_action.pattern
         action = extension_pattern_action.action
