@@ -16,7 +16,6 @@ class Rust(Language):
         return 'rust'
 
     def import_action(self, match, file_path, folder_path, content):
-        print(match, file_path)
         path = match.replace('::', '/')
         dependencies = self.get_module_dependencies(path, folder_path)
         if not dependencies:

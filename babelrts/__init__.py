@@ -25,7 +25,7 @@ class BabelRTS:
     def rts(self, all=False):
         self.get_change_discoverer().explore_codebase()
 
-        if all:
+        if all or self.get_change_discoverer().get_test_files().issubset(self.get_change_discoverer().get_changed_files()):
             return self.get_change_discoverer().get_test_files()
         
         if self.get_change_discoverer().get_changed_files():

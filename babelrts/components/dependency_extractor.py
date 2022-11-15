@@ -114,6 +114,8 @@ class DependencyExtractor:
                             dependency_graph[file].add(dependency)
 
     def get_dependency_graph(self):
+        if self._dependency_graph is None:
+            self.generate_dependency_graph()
         return self._dependency_graph
 
     def set_dependency_graph(self, dependency_graph):
@@ -198,8 +200,6 @@ class DependencyExtractor:
         self.generate_digraph(short_names).render(**kwargs)
 
     def generate_digraph(self, short_names=True):
-        if self.get_dependency_graph() is None:
-            self.generate_dependency_graph()
         g = Digraph()
         for f1, dependencies in self.get_dependency_graph().items():
             f1 = f1.replace('\\','/')
