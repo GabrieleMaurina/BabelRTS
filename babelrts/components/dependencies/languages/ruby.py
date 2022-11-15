@@ -6,8 +6,8 @@ class Ruby(TokenLanguage):
         return 'rb'
 
     def get_tokens(self):
-        return ('load','require','include','extend','prepend', 'java_import', 'include_class', 'import')
+        return ('load','require','include','extend','prepend')
 
     @staticmethod
     def get_language():
-        return ('ruby', 'jruby')
+        return 'ruby'

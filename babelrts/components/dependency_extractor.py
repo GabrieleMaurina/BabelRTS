@@ -19,6 +19,7 @@ from babelrts.components.dependencies.languages.groovy import Groovy
 from babelrts.components.dependencies.languages.haskell import Haskell
 from babelrts.components.dependencies.languages.java import Java
 from babelrts.components.dependencies.languages.javascript import Javascript
+from babelrts.components.dependencies.languages.jruby import JRuby
 from babelrts.components.dependencies.languages.kotlin import Kotlin
 from babelrts.components.dependencies.languages.lua import Lua
 from babelrts.components.dependencies.languages.matlab import MatLab
@@ -45,10 +46,10 @@ from collections.abc import Iterable
 from os.path import join, relpath, normpath, isabs, basename, dirname
 from graphviz import Digraph
 
-LANGUAGE_IMPLEMENTATIONS = (Ada, Asp, AutoHotkey, AutoIt, C, CSharp, Cobol,
-    Cobra, Cpp, D, Dart, Erlang, Fortran, Go, Groovy, Haskell, Java, Javascript,
-    Kotlin, Lua, MatLab, ObjectiveC, Ocaml, Pascal, Pearl, Php, Prolog, Python,
-    R, Red, Ruby, Rust, Scala, StandardML, SwiProlog, Swift, Typescript, VisualBasic)
+LANGUAGE_IMPLEMENTATIONS = (Ada, Asp, AutoHotkey, AutoIt, C, CSharp, Cobol, Cobra,
+    Cpp, D, Dart, Erlang, Fortran, Go, Groovy, Haskell, Java, Javascript, JRuby,
+    Kotlin, Lua, MatLab, ObjectiveC, Ocaml, Pascal, Pearl, Php, Prolog, Python, R,
+    Red, Ruby, Rust, Scala, StandardML, SwiProlog, Swift, Typescript, VisualBasic)
 
 class DependencyExtractor:
 
