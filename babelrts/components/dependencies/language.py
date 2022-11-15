@@ -14,9 +14,8 @@ class Language(ABC):
 
     def is_dir(self, path):
         return isdir(join(self.get_project_folder(), normpath(path)))
-        
+
     def expand(self, path):
-        #print(normpath(path))
         project_folder = self.get_project_folder()
         for value in glob(join(project_folder, normpath(path))):
             yield relpath(value, project_folder)

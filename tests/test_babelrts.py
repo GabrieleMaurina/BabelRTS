@@ -13,10 +13,11 @@ REPOS = (
     'https://github.com/paramiko/paramiko.git',
     'https://github.com/vega/datalib.git',
     'https://github.com/erlydtl/erlydtl.git',
+    'https://github.com/sjdirect/abot.git',
+    'https://github.com/sharkdp/bat.git',
     'https://github.com/soundcloud/twinagle.git',
     'https://github.com/AFNetworking/AFNetworking.git',
     'https://github.com/Moya/Moya.git',
-    'https://github.com/sjdirect/abot.git',
 )
 
 TEST_INPUTS = (
@@ -25,10 +26,11 @@ TEST_INPUTS = (
     ('repos/paramiko', 'paramiko', 'tests', 'python'),
     ('repos/datalib', 'src', 'test', 'javascript'),
     ('repos/erlydtl', 'src', 'test', 'erlang'),
+    ('repos/abot', 'Abot2', 'Abot2.Tests.Unit', 'c#'),
+    ('repos/bat', 'src', 'test', 'rust'),
     ('repos/twinagle', 'runtime/src/main/scala', 'runtime/src/test/scala', 'scala'),
     ('repos/AFNetworking', 'AFNetworking', 'Tests', 'objective-c'),
     ('repos/Moya', 'Sources', 'Tests', 'swift'),
-    ('repos/abot', 'Abot2', 'Abot2.Tests.Unit', 'c#'),
 )
 
 @pytest.fixture(scope='module', autouse=True)
