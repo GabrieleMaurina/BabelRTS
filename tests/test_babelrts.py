@@ -27,7 +27,7 @@ TEST_INPUTS = (
     ('repos/datalib', 'src', 'test', 'javascript'),
     ('repos/erlydtl', 'src', 'test', 'erlang'),
     ('repos/abot', 'Abot2', 'Abot2.Tests.Unit', 'c#'),
-    ('repos/bat', 'src', 'test', 'rust'),
+    ('repos/bat', 'src', 'tests', 'rust'),
     ('repos/twinagle', 'runtime/src/main/scala', 'runtime/src/test/scala', 'scala'),
     ('repos/AFNetworking', 'AFNetworking', 'Tests', 'objective-c'),
     ('repos/Moya', 'Sources', 'Tests', 'swift'),

@@ -10,4 +10,4 @@ class Ruby(TokenLanguage):
 
     @staticmethod
     def get_language():
-        return 'ruby'
+        return ('ruby', 'jruby')

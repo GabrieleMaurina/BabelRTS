@@ -23,7 +23,11 @@ class Rust(Language):
         return dependencies
 
     def get_module_dependencies(self, path, folder_path):
-        if self.is_file(file := join(folder_path, path + '.rs')):
-            return file
-        elif self.is_dir(path):
-            return tuple(self.expand(join(folder_path, path, '*.rs')))
+        dependencies = []
+        for folder in self.get_folders(folder_path):
+            if self.is_file(file := join(folder, path + '.rs')):
+                dependencies.append(file)
+            elif self.is_dir(dir := join(folder, path)):
+                for file in self.expand(join(dir, '*.rs')):
+                    dependencies.append(file)
+        return dependencies

@@ -19,7 +19,7 @@ class C(Language):
 
     def include_action(self, match, file_path, folder_path, content):
         dependencies = set()
-        for folder in self.get_import_folders():
+        for folder in self.get_folders(folder_path):
             if self.is_file(file:=join(folder, match)):
                 dependencies.add(self.check_two_way(file, file_path))
         return dependencies
@@ -31,7 +31,3 @@ class C(Language):
             return TwoWayDependency(dependency)
         else:
             return dependency
-
-    def get_import_folders(self):
-        babelrts = self.get_dependency_extractor().get_babelrts()
-        return chain(('', self.get_project_folder()), babelrts.get_source_folders(), babelrts.get_test_folders())
