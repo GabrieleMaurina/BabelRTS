@@ -60,12 +60,12 @@ class TokenLanguage(Language):
             for file in all_files:
                 name = basename(file).rsplit('.', 1)[0].lower()
                 folder = basename(dirname(file)).lower()
-                
+
                 if name not in self._file_tokens: self._file_tokens[name] = []
-                self._file_tokens[name] += file
-                
+                self._file_tokens[name].append(file)
+
                 if folder not in self._folder_tokens: self._folder_tokens[folder] = []
-                self._folder_tokens[folder] += file
+                self._folder_tokens[folder].append(file)
 
     def get_additional_dependencies(self):
         self.reset()
