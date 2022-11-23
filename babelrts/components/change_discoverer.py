@@ -34,7 +34,7 @@ class ChangeDiscoverer:
         extensions = self.get_babelrts().get_dependency_extractor().get_extensions()
 
         for root, dirs, files in walk(join(project_folder, path)):
-            dirs[:] = [dir for dir in dirs if dir[0] != '.' and dir not in excluded]
+            dirs[:] = [dir for dir in dirs if not dir.startswith('.') and dir not in excluded]
             for file in files:
                 if file not in excluded:
                     file_path = normpath(relpath(join(root, file), project_folder))

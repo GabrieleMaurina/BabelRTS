@@ -186,7 +186,7 @@ class DependencyExtractor:
             self._patterns_actions[extension].append((pattern, action))
 
     def get_extensions(self):
-        return self._patterns_actions.keys()
+        return tuple(self._patterns_actions.keys())
 
     def visualize_digraph(self, **kwargs):
         if 'filename' not in kwargs:

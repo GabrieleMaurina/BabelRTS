@@ -46,7 +46,7 @@ class BabelRTS:
 
     def set_source_folders(self, source_folders):
         if not source_folders:
-            self._source_folders = (self.get_project_folder(),)
+            self._source_folders = ('',)
         elif isinstance(source_folders, str):
             self._source_folders = (normpath(source_folders),)
         else:
@@ -57,7 +57,7 @@ class BabelRTS:
 
     def set_test_folders(self, test_folders):
         if not test_folders:
-            self._test_folders = (self.get_project_folder(),)
+            self._test_folders = ('',)
         elif isinstance(test_folders, str):
             self._test_folders = (normpath(test_folders),)
         else:
