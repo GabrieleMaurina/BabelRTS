@@ -26,13 +26,13 @@ class BabelRTS:
         self.get_change_discoverer().explore_codebase()
 
         if all or self.get_change_discoverer().get_test_files().issubset(self.get_change_discoverer().get_changed_files()):
-            return self.get_change_discoverer().get_test_files()
-        
+            self.get_test_selector().set_selected_tests(self.get_change_discoverer().get_test_files())
+            return self.get_test_selector().get_selected_tests()
+
         if self.get_change_discoverer().get_changed_files():
             self.get_dependency_extractor().generate_dependency_graph()
-            self.get_test_selector().select_tests()
-            return self.get_test_selector().get_selected_tests()
-        
+            return self.get_test_selector().select_tests()
+
         return ()
 
     def get_project_folder(self):
