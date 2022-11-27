@@ -21,7 +21,7 @@ class Python(Language):
             path =  join(folder_path, string)
         elif dots > 1:
             folders = normpath(folder_path).split(sep)
-            path =  sep.join(folders[:1-dots])
+            path =  join(*folders[:1-dots], string)
         else:
             path = string
         return path.replace('.', sep)
