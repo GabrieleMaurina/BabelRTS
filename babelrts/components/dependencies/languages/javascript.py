@@ -5,9 +5,9 @@ from re import compile as cmp_re
 from itertools import chain
 from os.path import join
 
-REQUIRE_PATTERN = cmp_re(r'(?<!\S)require\s*\(\s*[\'"](.*)[\'"]\s*\)')
-IMPORT_PATTERN = cmp_re(r'(?<!\S)import\s[\s\S]+?\sfrom\s+[\'"](.*?)[\'"]')
-EXPORT_PATTERN = cmp_re(r'(?<!\S)export\s[\s\S]+?\sfrom\s+[\'"](.*?)[\'"]')
+REQUIRE_PATTERN = cmp_re(r'\brequire\s*\(\s*[\'"](.*)[\'"]\s*\)')
+IMPORT_PATTERN = cmp_re(r'\bimport\s[\s\S]+?\sfrom\s+[\'"](.*?)[\'"]')
+EXPORT_PATTERN = cmp_re(r'\bexport\s[\s\S]+?\sfrom\s+[\'"](.*?)[\'"]')
 
 PATTERNS = (REQUIRE_PATTERN, IMPORT_PATTERN, EXPORT_PATTERN)
 

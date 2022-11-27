@@ -4,16 +4,16 @@ from babelrts.components.dependencies.extension_pattern_action import ExtensionP
 from re import compile as cmp_re
 from os.path import join, relpath, normpath
 
-IMPORT_PATTERN = cmp_re(r'(?<!\S)import\s+(\S+)\s*;')
-IMPORT_STATIC_PATTERN = cmp_re(r'(?<!\S)import\s+static\s+(\S+)\s*;')
-PACKAGE_PATTERN = cmp_re(r'(?<!\S)package\s+(\S+)\s*;')
-EXTENDS_PATTERN = cmp_re(r'(?<!\S)extends\s+([\s\S]+?)\s*(?:{|implements)')
-IMPLEMENTS_PATTERN = cmp_re(r'(?<!\S)implements\s+([\s\S]+?)\s*(?:{|extends)')
-NEW_PATTERN = cmp_re(r'(?<!\S)new\s+(\S+)\s*\(\s*')
-STATIC_PATTERN = cmp_re(r'(?<!\S)([A-Z]\S+)\.')
+IMPORT_PATTERN = cmp_re(r'\bimport\s+(\S+)\s*;')
+IMPORT_STATIC_PATTERN = cmp_re(r'\bimport\s+static\s+(\S+)\s*;')
+PACKAGE_PATTERN = cmp_re(r'\bpackage\s+(\S+)\s*;')
+EXTENDS_PATTERN = cmp_re(r'\bextends\s+([\s\S]+?)\s*(?:{|implements)')
+IMPLEMENTS_PATTERN = cmp_re(r'\bimplements\s+([\s\S]+?)\s*(?:{|extends)')
+NEW_PATTERN = cmp_re(r'\bnew\s+(\S+)\s*\(\s*')
+STATIC_PATTERN = cmp_re(r'\b([A-Z]\S+)\.')
 ANNOTATION_PATTERN = cmp_re(r'(?<!\S)@(\S+)(?:\s*\()?')
-THROWS_PATTERN = cmp_re(r'(?<!\S)throws\s+([\s\S]+?)\s*{')
-CATCH_PATTERN = cmp_re(r'(?<!\S)catch\s*\(\s*([\s\S]+?)\s*\S+\)')
+THROWS_PATTERN = cmp_re(r'\bthrows\s+([\s\S]+?)\s*{')
+CATCH_PATTERN = cmp_re(r'\bcatch\s*\(\s*([\s\S]+?)\s*\S+\)')
 
 SPLIT = cmp_re(r',|\||\n')
 

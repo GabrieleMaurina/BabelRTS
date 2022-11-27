@@ -4,9 +4,9 @@ from babelrts.components.dependencies.extension_pattern_action import ExtensionP
 from re import compile as cmp_re
 from collections import defaultdict
 
-NAMESPACE_PATTERN = cmp_re(r'(?<!\S)namespace\s+(\S+?)\s*[{;]')
-USING_PATTERN = cmp_re(r'(?<!\S)using\s+(\S+?)\s*;')
-ACCESS_PATTERN = cmp_re(r'(?<!\S)([A-Z]\S+)\.')
+NAMESPACE_PATTERN = cmp_re(r'\bnamespace\s+(\S+?)\s*[{;]')
+USING_PATTERN = cmp_re(r'\busing\s+(\S+?)\s*;')
+ACCESS_PATTERN = cmp_re(r'\b([A-Z]\S+)\.')
 
 class CSharp(Language):
 

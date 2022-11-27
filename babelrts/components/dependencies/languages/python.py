@@ -4,7 +4,7 @@ from babelrts.components.dependencies.extension_pattern_action import ExtensionP
 from re import compile as cmp_re
 from os.path import join, normpath, sep
 
-IMPORT_PATTERN = cmp_re(r'(?<!\S)(?:from\s+(\S+)\s+)?import\s+(.+)\s*?\n')
+IMPORT_PATTERN = cmp_re(r'\b(?:from\s+(\S+)\s+)?import\s+(.+)\s*?\n')
 
 class Python(Language):
 

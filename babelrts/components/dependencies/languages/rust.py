@@ -4,7 +4,7 @@ from babelrts.components.dependencies.extension_pattern_action import ExtensionP
 from re import compile as cmp_re
 from os.path import join
 
-IMPORT_PATTERN = cmp_re(r'(?<!\S)(?:mod|use)\s+(\S+?)[\s;{]')
+IMPORT_PATTERN = cmp_re(r'\b(?:mod|use)\s+(\S+?)[\s;{]')
 
 class Rust(Language):
 
