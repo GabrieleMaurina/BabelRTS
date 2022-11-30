@@ -59,23 +59,28 @@ class Java(Language):
         clazzes = (clazz for clazz in (v.strip() for v in SPLIT.split(match)) if clazz)
         return (file for clazz in clazzes for file in self.class_to_files(clazz, folder_path))
 
-    def fix_path(path):
+    def fix_path(self, path):
         tokens = SPLIT_PATH.split(normpath(path))
         tokens = (v.strip() for v in tokens)
         tokens = (v for v in tokens if v)
-        path = sep.join(tokens)
+        return sep.join(tokens)
 
-    def get_package_path(folder):
-        folder = fix_path(folder)
+    def get_package_path(self, folder):
+        folder = self.fix_path(folder)
         for path in self.get_source_test_folders():
-            path = fix_path(path) + sep
+            path = self.fix_path(path) + sep
             if folder.startswith(path):
                 return relpath(folder, path)
 
     def class_to_files(self, clazz, folder_path):
         class_path = clazz.replace('.', sep) + '.java'
-        package_path = get_package_path(folder_path)
-        packages = ('', package_path)
+        package_path = self.get_package_path(folder_path)
+
+        if package_path:
+            packages = ('', package_path)
+        else:
+            packages = ('',)
+
         folders = self.get_source_test_folders()
 
         paths = (join(folder, package, class_path) for folder in folders for package in packages)
