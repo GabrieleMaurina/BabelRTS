@@ -3,6 +3,7 @@ from babelrts.components.dependencies.extension_pattern_action import ExtensionP
 
 from re import compile as cmp_re
 from os.path import join, relpath, normpath
+from os import sep
 
 IMPORT_PATTERN = cmp_re(r'\bimport\s+(\S+)\s*;')
 IMPORT_STATIC_PATTERN = cmp_re(r'\bimport\s+static\s+(\S+)\s*;')
@@ -16,10 +17,7 @@ THROWS_PATTERN = cmp_re(r'\bthrows\s+([\s\S]+?)\s*{')
 CATCH_PATTERN = cmp_re(r'\bcatch\s*\(\s*([\s\S]+?)\s*\S+\)')
 
 SPLIT = cmp_re(r',|\||\n')
-
-SRC_FOLDER = 'src/main/java/'
-TEST_FOLDER = 'src/test/java/'
-FOLDERS = (SRC_FOLDER, TEST_FOLDER)
+SPLIT_PATH = cmp_re(r'\\|\/')
 
 class Java(Language):
     def get_extensions_patterns_actions(self):
@@ -43,7 +41,7 @@ class Java(Language):
     def import_action(self, match, file_path, folder_path, content):
         if match.endswith('*'):
             path = match.replace('.', '/') + '.java'
-            return (file for folder in FOLDERS for file in self.expand(join(folder, path)))
+            return (file for folder in self.get_source_test_folders() for file in self.expand(join(folder, path)))
         else:
             return self.class_to_files(match, folder_path)
 
@@ -52,7 +50,7 @@ class Java(Language):
         return self.class_to_files(match, folder_path)
 
     def package_action(self, match, file_path, folder_path, content):
-        return (file for folder in FOLDERS for file in self.expand(join(folder_path, '*.java')))
+        return (file for folder in self.get_source_test_folders() for file in self.expand(join(folder_path, '*.java')))
 
     def used_class_action(self, match, file_path, folder_path, content):
         return self.class_to_files(match, folder_path)
@@ -61,11 +59,25 @@ class Java(Language):
         clazzes = (clazz for clazz in (v.strip() for v in SPLIT.split(match)) if clazz)
         return (file for clazz in clazzes for file in self.class_to_files(clazz, folder_path))
 
+    def fix_path(path):
+        tokens = SPLIT_PATH.split(normpath(path))
+        tokens = (v.strip() for v in tokens)
+        tokens = (v for v in tokens if v)
+        path = sep.join(tokens)
+
+    def get_package_path(folder):
+        folder = fix_path(folder)
+        for path in self.get_source_test_folders():
+            path = fix_path(path) + sep
+            if folder.startswith(path):
+                return relpath(folder, path)
+
     def class_to_files(self, clazz, folder_path):
-        clazz = clazz.replace('.', '/') + '.java'
-        folder_path = normpath(folder_path)
-        if folder_path.startswith(SRC_FOLDER):
-            other_path = join(TEST_FOLDER, relpath(folder_path, SRC_FOLDER))
-        else:
-            other_path = join(SRC_FOLDER, relpath(folder_path, TEST_FOLDER))
-        return (path for path in (join(folder, clazz) for folder in FOLDERS + (folder_path, other_path)) if self.is_file(path))
+        class_path = clazz.replace('.', sep) + '.java'
+        package_path = get_package_path(folder_path)
+        packages = ('', package_path)
+        folders = self.get_source_test_folders()
+
+        paths = (join(folder, package, class_path) for folder in folders for package in packages)
+
+        return (path for path in paths if self.is_file(path))

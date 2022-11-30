@@ -36,14 +36,18 @@ class Language(ABC):
     def get_project_folder(self):
         return self.get_dependency_extractor().get_babelrts().get_project_folder()
 
-    def get_folders(self, folders=()):
+    def get_source_test_folders(self):
         babelrts = self.get_dependency_extractor().get_babelrts()
-        project_folder = babelrts.get_project_folder()
         source_folders = babelrts.get_source_folders()
         test_folders = babelrts.get_test_folders()
+        return chain(source_folders, test_folders)
+
+    def get_folders(self, folders=()):
+        babelrts = self.get_dependency_extractor().get_babelrts()
+        project_folder = (babelrts.get_project_folder(),)
         if isinstance(folders, str):
             folders = (folders,)
-        return chain((project_folder,), source_folders, test_folders, folders)
+        return chain(project_folder, folders, self.get_source_test_folders())
 
     def get_dependency_extractor(self):
         return self._dependency_extractor
