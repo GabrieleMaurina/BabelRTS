@@ -22,7 +22,7 @@ class ChangeDiscoverer:
         self.set_all_files(self.get_test_files() | self.get_source_files())
 
         old_hashcodes = self._load_hashcodes()
-        new_hashcodes = {file:self._sha1(file) for file in self._all_files}
+        new_hashcodes = {file:self._sha1(file) for file in self.get_all_files()}
         self._save_hashcodes(new_hashcodes)
         self.set_changed_files({file for file, hash in new_hashcodes.items() if file not in old_hashcodes or new_hashcodes[file] != old_hashcodes[file]})
 
