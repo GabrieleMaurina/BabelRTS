@@ -1,7 +1,7 @@
 import babelrts
 
 from argparse import ArgumentParser
-from os.path import relpath, normpath
+from os.path import relpath
 
 def parse_args():
     description = 'BabelRTS v{}. BabelRTS is a regression test selection tool. Given a codebase that has changed, BabelRTS selects modification traversing tests. Find out more at https://github.com/GabrieleMaurina/BabelRTS'.format(babelrts.__version__)
@@ -13,6 +13,7 @@ def parse_args():
     parser.add_argument('-l', metavar='<languages>', nargs='+', help='select target languages (default all)')
     parser.add_argument('-a', action='store_true', help='select all tests')
     parser.add_argument('-g', metavar='<graph path>', nargs='?', default='', help='generate graph')
+    parser.add_argument('--git', metavar='<commit>', nargs='?', default='', help='use git diff to determine changes')
     args = parser.parse_args()
     return args
 
@@ -21,7 +22,11 @@ def main():
     project_folder = args.p
     source_folders = {relpath(source_folder, project_folder) if project_folder and source_folder else source_folder for source_folder in args.s}
     test_folders = {relpath(test_folder, project_folder) if project_folder and test_folder else test_folder for test_folder in args.t}
-    babelRTS = babelrts.BabelRTS(project_folder, source_folders, test_folders, args.e, args.l)
+    if args.git == None:
+        args.git = ''
+    elif args.git == '':
+        args.git = None
+    babelRTS = babelrts.BabelRTS(project_folder, source_folders, test_folders, args.e, args.l, git=args.git)
     selected_tests = babelRTS.rts(args.a)
     for test_file in selected_tests:
         print(test_file)

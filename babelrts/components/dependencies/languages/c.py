@@ -3,15 +3,16 @@ from babelrts.components.dependencies.extension_pattern_action import ExtensionP
 from babelrts.components.dependencies.two_way_dependency import TwoWayDependency
 
 from re import compile as cmp_re
-from os.path import join, basename
-from itertools import chain
+from os.path import join, basename, commonprefix
 
 INCLUDE_PATTERN = cmp_re(r'#include\s*["<](\S+?)[">]')
+START_PATTERN = cmp_re(r'^')
 
 class C(Language):
 
     def get_extensions_patterns_actions(self):
-        return ExtensionPatternAction('c', INCLUDE_PATTERN, self.include_action)
+        return (ExtensionPatternAction('c', INCLUDE_PATTERN, self.include_action),
+                ExtensionPatternAction('c', START_PATTERN, self.naming_convention_action))
 
     @staticmethod
     def get_language():
@@ -31,3 +32,17 @@ class C(Language):
             return TwoWayDependency(dependency)
         else:
             return dependency
+
+    def naming_convention_action(self, match, file_path, folder_path, content):
+        dependencies = set()
+        file_name = basename(file_path)
+        file_name_len = len(file_name)
+        files = self.get_dependency_extractor().get_babelrts().get_change_discoverer().get_all_files()
+        files = (file for file in files if file.startswith(folder_path) and file != file_path)
+        for file in files:
+            name = basename(file)
+            common = len(commonprefix((file_name, name)))
+            if common > 6 and common > file_name_len * 0.75:
+                dependencies.add(file)
+        return dependencies
+

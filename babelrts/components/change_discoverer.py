@@ -4,6 +4,7 @@ from json import load, dump
 from hashlib import sha1
 from os.path import relpath, normpath, isfile
 from os import remove
+from subprocess import run
 
 BABELRTS_FILE = '.babelrts'
 
@@ -21,12 +22,25 @@ class ChangeDiscoverer:
         self.set_source_files({file for source_folder in self.get_babelrts().get_source_folders() for file in self._find_files(source_folder)} - self.get_test_files())
         self.set_all_files(self.get_test_files() | self.get_source_files())
 
-        old_hashcodes = self._load_hashcodes()
-        new_hashcodes = {file:self._sha1(file) for file in self.get_all_files()}
-        self._save_hashcodes(new_hashcodes)
-        self.set_changed_files({file for file, hash in new_hashcodes.items() if file not in old_hashcodes or new_hashcodes[file] != old_hashcodes[file]})
+        commit = self.get_babelrts().get_git()
+        if commit is None:
+            old_hashcodes = self._load_hashcodes()
+            new_hashcodes = {file:self._sha1(file) for file in self.get_all_files()}
+            self._save_hashcodes(new_hashcodes)
+            self.set_changed_files({file for file, hash in new_hashcodes.items() if file not in old_hashcodes or new_hashcodes[file] != old_hashcodes[file]})
+        else:
+            changed_files = self._git_diff(commit)
+            self.set_changed_files(changed_files)
+
 
         return self.get_all_files(), self.get_source_files(), self.get_test_files(), self.get_changed_files()
+
+    def _git_diff(self, commit):
+        result = self.rc(f'git --no-pager diff --name-only {commit}', self.get_babelrts().get_project_folder())
+        if result.returncode:
+            raise Exception(result.stderr)
+        files = {normpath(file) for file in result.stdout.split('\n') if file}
+        return files
 
     def _find_files(self, path):
         project_folder = self.get_babelrts().get_project_folder()
@@ -98,3 +112,6 @@ class ChangeDiscoverer:
 
     def set_babelrts(self, babelrts):
         self._babelrts = babelrts
+
+    def rc(self, cmd, cwd):
+        return run(cmd, cwd=cwd, shell=True, capture_output=True, text=True)

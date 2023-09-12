@@ -13,11 +13,12 @@ __status__ = 'Production'
 
 class BabelRTS:
 
-    def __init__(self, project_folder='.', source_folders=None, test_folders=None, excluded=(), languages=None, language_implementations=None):
+    def __init__(self, project_folder='.', source_folders=None, test_folders=None, excluded=(), languages=None, language_implementations=None, git=None):
         self.set_project_folder(project_folder)
         self.set_source_folders(source_folders)
         self.set_test_folders(test_folders)
         self.set_excluded(excluded)
+        self.set_git(git)
         self.set_change_discoverer(babelrts.components.change_discoverer.ChangeDiscoverer(self))
         self.set_dependency_extractor(babelrts.components.dependency_extractor.DependencyExtractor(self, languages, language_implementations))
         self.set_test_selector(babelrts.components.test_selector.TestSelector(self))
@@ -73,6 +74,12 @@ class BabelRTS:
             self._excluded = (normpath(excluded),)
         else:
             self._excluded = tuple(normpath(path) for path in excluded)
+
+    def set_git(self, git):
+        self._git = git
+
+    def get_git(self):
+        return self._git
 
     def get_change_discoverer(self):
         return self._change_discoverer
