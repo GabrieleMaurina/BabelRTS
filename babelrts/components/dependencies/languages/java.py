@@ -61,12 +61,12 @@ class Java(Language):
     def class_to_files(self, clazz, file_path):
         package = self.packages[file_path]
         package_class = f'{package}.{clazz}'
+        files = ()
         if clazz in self.classes:
-            return tuple(self.classes[clazz:])
+            files = tuple(self.classes[clazz:])
         elif package_class in self.classes:
-            return tuple(self.classes[package_class:])
-        else:
-            return ()
+            files = tuple(self.classes[package_class:])
+        return files
 
     def before(self):
         self.classes = StringTrie(separator='.')
