@@ -57,15 +57,19 @@ class Java(Language):
     def multiple_used_classes_action(self, match, file_path, folder_path, content):
         clazzes = (clazz for clazz in (v.strip() for v in SPLIT.split(match)) if clazz)
         return (file for clazz in clazzes for file in self.class_to_files(clazz, file_path))
+    
+    def get_files_for_class(self, clazz):
+        if self.classes.has_subtrie(clazz):
+            return tuple(file for files in self.classes[clazz:] for file in files)
+        else:
+            return ()
 
     def class_to_files(self, clazz, file_path):
-        package = self.packages[file_path]
-        package_class = f'{package}.{clazz}'
-        files = ()
-        if clazz in self.classes:
-            files = tuple(self.classes[clazz:])
-        elif package_class in self.classes:
-            files = tuple(self.classes[package_class:])
+        files = self.get_files_for_class(clazz)
+        if not files:
+            package = self.packages[file_path]
+            package_class = f'{package}.{clazz}'
+            files = self.get_files_for_class(package_class)
         return files
 
     def before(self):
@@ -75,7 +79,10 @@ class Java(Language):
         files = self.get_all_files()
         for file in files:
             clazz = self._find_clazz(file, folders)
-            self.classes[clazz] = file
+            if clazz in self.classes:
+                self.classes[clazz].append(file)
+            else:
+                self.classes[clazz] = [file]
             self.packages[file] = clazz.rsplit('.', 1)[0]
     
     def _find_clazz(self, file, folders):
