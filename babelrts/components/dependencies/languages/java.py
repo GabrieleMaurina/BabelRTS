@@ -12,10 +12,10 @@ PACKAGE_PATTERN = cmp_re(r'\bpackage\s+(\S+)\s*;')
 EXTENDS_PATTERN = cmp_re(r'\bextends\s+([\s\S]+?)\s*(?:{|implements)')
 IMPLEMENTS_PATTERN = cmp_re(r'\bimplements\s+([\s\S]+?)\s*(?:{|extends)')
 NEW_PATTERN = cmp_re(r'\bnew\s+(\S+?)\s*\(\s*')
-STATIC_PATTERN = cmp_re(r'\b([A-Z]\S+?)\.')
-ANNOTATION_PATTERN = cmp_re(r'(?<!\S)@(\S+)(?:\s*\()?')
-THROWS_PATTERN = cmp_re(r'\bthrows\s+([\s\S]+?)\s*{')
-CATCH_PATTERN = cmp_re(r'\bcatch\s*\(\s*([\s\S]+?)\s*\S+\)')
+STATIC_PATTERN = cmp_re(r'\b([A-Za-z_\.]+?)\.')
+ANNOTATION_PATTERN = cmp_re(r'(?<!\S)@(\w+)')
+THROWS_PATTERN = cmp_re(r'\bthrows\s+([A-Za-z_\., ]+?)\s*{')
+CATCH_PATTERN = cmp_re(r'\bcatch\s*\(\s*([A-Za-z_\.| ]+?)\s*\S+\)')
 
 SPLIT = cmp_re(r',|\||\n')
 SPLIT_PATH = cmp_re(r'\\|\/')
@@ -59,7 +59,7 @@ class Java(Language):
         return (file for clazz in clazzes for file in self.class_to_files(clazz, file_path))
     
     def get_files_for_class(self, clazz):
-        if self.classes.has_subtrie(clazz):
+        if clazz in self.classes or self.classes.has_subtrie(clazz):
             return tuple(file for files in self.classes[clazz:] for file in files)
         else:
             return ()
