@@ -2,7 +2,6 @@ from babelrts.components.dependencies.language import Language
 from babelrts.components.dependencies.extension_pattern_action import ExtensionPatternAction
 
 from re import compile as cmp_re
-from os.path import join, relpath, normpath
 from os import sep
 from pygtrie import StringTrie
 
