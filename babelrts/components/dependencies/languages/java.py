@@ -12,7 +12,7 @@ PACKAGE_PATTERN = cmp_re(r'\bpackage\s+(\S+)\s*;')
 EXTENDS_PATTERN = cmp_re(r'\bextends\s+([\s\S]+?)\s*(?:{|implements)')
 IMPLEMENTS_PATTERN = cmp_re(r'\bimplements\s+([\s\S]+?)\s*(?:{|extends)')
 NEW_PATTERN = cmp_re(r'\bnew\s+(\S+?)\s*\(\s*')
-STATIC_PATTERN = cmp_re(r'\b([A-Za-z_\.]+?)\.')
+STATIC_PATTERN = cmp_re(r'\b((?:[a-z0-9_\.]+\.)?[A-Z][A-Za-z0-9_]+?)\.[A-Za-z_]')
 ANNOTATION_PATTERN = cmp_re(r'(?<!\S)@(\w+)')
 THROWS_PATTERN = cmp_re(r'\bthrows\s+([A-Za-z_\., ]+?)\s*{')
 CATCH_PATTERN = cmp_re(r'\bcatch\s*\(\s*([A-Za-z_\.| ]+?)\s*\S+\)')
@@ -40,9 +40,11 @@ class Java(Language):
         return 'java'
 
     def import_action(self, match, file_path, folder_path, content):
+        multiple = False
         if match.endswith('*'):
             match = match[:-2]
-        return self.class_to_files(match, file_path)
+            multiple = True
+        return self.class_to_files(match, file_path, multiple, False)
 
     def import_static_action(self, match, file_path, folder_path, content):
         match = match.rsplit('.', 1)[0]
@@ -58,18 +60,19 @@ class Java(Language):
         clazzes = (clazz for clazz in (v.strip() for v in SPLIT.split(match)) if clazz)
         return (file for clazz in clazzes for file in self.class_to_files(clazz, file_path))
     
-    def get_files_for_class(self, clazz):
-        if clazz in self.classes or self.classes.has_subtrie(clazz):
+    def get_files_for_class(self, clazz, multiple):
+        if multiple and self.classes.has_subtrie(clazz):
             return tuple(file for files in self.classes[clazz:] for file in files)
-        else:
-            return ()
+        elif not multiple and clazz in self.classes:
+            return tuple(self.classes[clazz])
+        return ()
 
-    def class_to_files(self, clazz, file_path):
-        files = self.get_files_for_class(clazz)
-        if not files:
+    def class_to_files(self, clazz, file_path, multiple=False, allow_package=True):
+        files = self.get_files_for_class(clazz, multiple)
+        if allow_package and not files:
             package = self.packages[file_path]
             package_class = f'{package}.{clazz}'
-            files = self.get_files_for_class(package_class)
+            files = self.get_files_for_class(package_class, multiple)
         return files
 
     def before(self):
