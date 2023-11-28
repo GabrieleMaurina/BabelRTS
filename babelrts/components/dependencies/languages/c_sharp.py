@@ -5,20 +5,25 @@ from re import compile as cmp_re
 from collections import defaultdict
 
 NAMESPACE_PATTERN = cmp_re(r'\bnamespace\s+(\S+?)\s*[{;]')
-USING_PATTERN = cmp_re(r'\busing\s+(\S+?)\s*;')
-ACCESS_PATTERN = cmp_re(r'\b([A-Z]\S+)\.')
+#using has two different declaration: directive and
+USING_DIRECTIVE_PATTERN = cmp_re(r'\busing\s+(\S+?)\s*;')
+INHERIT_PATTERN = cmp_re(r'\bclass\s+(\S+?)\s*\:\s+([\s\S]+?)\s*{')
+NEW_PATTERN = cmp_re(r'\bnew\s+(\S+?)\s*\(\s*')
+
+THROW_PATTERN = cmp_re(r'\bthrow\s+([\s\S]+?)\s*;')
+CATCH_PATTERN = cmp_re(r'\bcatch\s*\(\s*([\s\S]+?)\s*\S+\)')
 
 class CSharp(Language):
 
-    def __init__(self, dependency_extractor):
-        super().__init__(dependency_extractor)
-        self._reset()
+#NOTE: IS THIS REQUIRED?
+    # def __init__(self, dependency_extractor):
+    #     super().__init__(dependency_extractor)
+    #     self._reset()
 
     def get_extensions_patterns_actions(self):
         return  (
             ExtensionPatternAction('cs', NAMESPACE_PATTERN, self.namespace_action),
-            ExtensionPatternAction('cs', USING_PATTERN, self.using_action),
-            ExtensionPatternAction('cs', ACCESS_PATTERN, self.using_action)
+            ExtensionPatternAction('cs', USING_DIRECTIVE_PATTERN, self.using_action),
         )
 
     @staticmethod
@@ -27,11 +32,13 @@ class CSharp(Language):
 
     def namespace_action(self, match, file_path, folder_path, content):
         namespaces = match.split('.')
+
         self._dependencies[file_path].add(namespaces[-1])
         self._namespaces[namespaces[-1]].add(file_path)
 
     def using_action(self, match, file_path, folder_path, content):
         namespaces = match.split('.')
+
         self._dependencies[file_path].add(namespaces[-1])
         if len(namespaces)>1:
             self._dependencies[file_path].add(namespaces[-2])
@@ -44,6 +51,7 @@ class CSharp(Language):
         self._reset()
         return additional_dependencies
 
-    def _reset(self):
-        self._dependencies = defaultdict(set)
-        self._namespaces = defaultdict(set)
+#NOTE: IS THIS REQUIRED?
+    # def _reset(self):
+    #     self._dependencies = defaultdict(set)
+    #     self._namespaces = defaultdict(set)
