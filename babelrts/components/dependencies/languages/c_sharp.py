@@ -17,7 +17,7 @@ CATCH_PATTERN = cmp_re(r'\bcatch\s*\(\s*([\s\S]+?)\s*\S+\)')
 
 class CSharp(Language):
 
-#NOTE: IS THIS REQUIRED?
+
     def __init__(self, dependency_extractor):
         super().__init__(dependency_extractor)
         self._reset()
@@ -58,8 +58,6 @@ class CSharp(Language):
 
         return self.getAllFilesFromFolder(pathToScopedFolder)
 
-    #NOTE: We're going to ignore interfaces. It seems a bit more complicated
-    # to find them via file names. The files themselves have to be read.
     # TO DO-LATER: Use string similarity to check if two names are similar
     # enough to be considered the same word. Such as ExitActionBehavior and ExitActionBehaviour
     def inherit_action(self, match, file_path, folder_path, content):
@@ -67,19 +65,27 @@ class CSharp(Language):
         classesInherited = []
 
         for inherited in inheritedClasses:
-            #Ignoring the interface inherited
-            if inherited[0] != 'I' or inherited[1].islower():
-                inheritedPath = sep + inherited + ".cs"
-
-                if self.is_file(folder_path + inheritedPath):
-                    classesInherited.append(folder_path + inheritedPath)
-                else:
-                    for usingPath in self._using[file_path]:
-                        if self.is_file(usingPath + inheritedPath):
-                            classesInherited.append(usingPath + inheritedPath)
+            path = self.findPathForClass(inherited, file_path, folder_path)
+            if path is not None:
+                classesInherited.append(path)
 
         return classesInherited
 
+    def new_action(self, match, file_path, folder_path, content):
+        return 0
+
+    #NOTE: We're going to ignore interfaces. It seems a bit more complicated
+    # to find them via file names. The files themselves have to be read.
+    def findPathForClass(self, className, file_path, folder_path):
+        if className[0] != 'I' or className[1].islower():
+            inheritedPath = sep + className + ".cs"
+
+            if self.is_file(folder_path + inheritedPath):
+                return folder_path + inheritedPath
+            else:
+                for usingPath in self._using[file_path]:
+                    if self.is_file(usingPath + inheritedPath):
+                        return usingPath + inheritedPath
     def getAllFilesFromFolder(self, pathToScopedFolder):
         files = []
 
