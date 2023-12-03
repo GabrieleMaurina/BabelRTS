@@ -34,8 +34,8 @@ class CSharp(Language):
 
     def namespace_action(self, match, file_path, folder_path, content):
         namespaces = match.split('.')
-        #
-        # self._dependencies[file_path].add(namespaces[-1])
+
+        self._dependencies[file_path].add(namespaces[-1])
         # self._namespaces[namespaces[-1]].add(file_path)
 
     def using_action(self, match, file_path, folder_path, content):
@@ -47,12 +47,13 @@ class CSharp(Language):
         if tail == rootUsing:
             # Make this part more well written..?
             pathToScopedFolder = usingPath
-            if head is not "":
+            if head != "":
                 pathToScopedFolder = head + sep + usingPath
         else:
             pathToScopedFolder = self._sourceFolder + sep + usingPath
 
-        self._dependencies[file_path] = pathToScopedFolder
+        if self.is_dir(pathToScopedFolder):
+            self._using[file_path].add(pathToScopedFolder)
 
         return self.getAllFilesFromFolder(pathToScopedFolder)
 
@@ -60,9 +61,6 @@ class CSharp(Language):
         files = []
 
         if self.is_dir(pathToScopedFolder):
-            print("PATH TO SCOPE:")
-            print(pathToScopedFolder)
-
             for file in self.get_all_files():
                 if pathToScopedFolder in file:
                     files.append(file)
@@ -80,5 +78,6 @@ class CSharp(Language):
 #NOTE: IS THIS REQUIRED?
     def _reset(self):
         self._sourceFolder = list(self.get_source_test_folders())[0]
+        self._using = defaultdict(set)
         self._dependencies = defaultdict(set)
         self._namespaces = defaultdict(set)
