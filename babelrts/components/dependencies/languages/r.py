@@ -151,11 +151,11 @@ class R(Language):
         #     return dependencies
         
         # secondly check if there is a file with same function name
-        file = self.search_file_in_directory(match)
-        if file is not None:
-            dependencies.append(file)
-            print(dependencies)
-            return dependencies
+        # file = self.search_file_in_directory(match)
+        # if file is not None:
+        #     dependencies.append(file)
+        #     print(dependencies)
+        #     return dependencies
 
         # third look up in the function->file mapping dictionary ** this checking is for all the files and functions
         file = self.get_file_path_from_function(match)
