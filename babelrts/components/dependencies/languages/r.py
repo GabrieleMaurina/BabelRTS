@@ -15,12 +15,26 @@ SOURCE_HERE_PATTERN = cmp_re(r'\bsource\s*\([A-Za-z:]*\(["\']([A-Za-z0-9-_.]*\/[
 
 # Dependency in gloabl scope like calling sum() from A.R file inside B.R without any imports
 # for such cases, we need to look inside NAMESPACE for possible match of file name corresponding to that function sum()
-FUNCTION_CALLING_PATTERN = cmp_re(r'\b([A-Za-z0-9-_.]+)\s*\(')
+
+#FUNCTION_CALLING_PATTERN = cmp_re(r'\b([A-Za-z0-9-_.]+)\s*\(')
+
+KEYWORDS = ['if','else','function','return','class','source','context','for','while','next','c','print','sum','min',
+            'max','str','length','mean','library','package','test_that','list','tryCatch','expect_equal','expect_true',
+            'expect_false','exists','ncol','range','abs','sqrt','round','ceiling','floor','substr']
+
+# excludig the common keywords / built in functions 
+FUNCTION_CALLING_PATTERN = cmp_re(r'\b(?!{})([A-Za-z0-9-_.]+)\s*\('.format('|'.join(KEYWORDS)))
+
+# sum = function() or sum <- function()
+FUNCTION_DECLARATION_PATTERN = cmp_re(r'\b([A-Za-z0-9-_.]+)\s*[=<-]+\s*function\s*\(')
+
 
 
 class R(Language):
+    
 
     def get_extensions_patterns_actions(self):
+        self.function_to_file_map = self.make_all_function_to_file_mapping()
         return (ExtensionPatternAction('R', SOURCE_PATTERN, self.source_action),
                 ExtensionPatternAction('R', SOURCE_HERE_PATTERN, self.source_here_action),
                 ExtensionPatternAction('R', FUNCTION_CALLING_PATTERN, self.function_calling_action))
@@ -30,8 +44,7 @@ class R(Language):
         return 'r'
     
     def is_r_keyword(self,word):
-        keywords = ['if','else','function','return','class','source','context','for','while','next','c','print','sum','min','max','str','length','mean','library','package','test_that','list','tryCatch']
-        if word in keywords:
+        if word in KEYWORDS:
             return True
         return False
     
@@ -67,15 +80,43 @@ class R(Language):
         
         return None
     
-    def check_namespace_entries(self,match,file_path,folder_path):
+
+    def file_read(self,file):
+        full_path = join(self.get_project_folder(),file)
+        with open(full_path, 'r') as content:
+            return content.read()
         
-        return 
     
-    def search_file_in_directory(self,match,file_path,folder_path,content):
+    def make_all_function_to_file_mapping(self):
+        #src_folder = next(self.get_source_test_folders())
+        # print("src_folder: "+src_folder)
+        func_to_file = {}
+
+        for folder in self.get_source_test_folders():
+            for file in self.expand(join(folder, '*.R')):
+                #print(file)
+                #print(folder)
+                content = self.file_read(file)
+                for match in FUNCTION_DECLARATION_PATTERN.findall(content):
+                    func_to_file[match] = file
+            
+            # break: only worked on first (src) folder 
+            break
+        
+        #print(func_to_file)
+        return func_to_file
+
+    def get_file_path_from_function(self,match):
+        if match in self.function_to_file_map.keys():
+            file = self.function_to_file_map[match]
+            return file
+        return None
+    
+    def search_file_in_directory(self,match):
         if self.is_r_keyword(match):
             return None
         
-        for folder in self.get_folders(folder_path):
+        for folder in self.get_source_test_folders():
             file = join(folder,match+'.R')
             if self.is_file(file):
                 return file
@@ -83,8 +124,10 @@ class R(Language):
         return None
     
     def check_function_assignment(self,match,content):
-        FUNCTION_ASSIGNMENT_PATTERN = cmp_re(r'{}[=<-]'.format(match))
-        return
+        FUNCTION_ASSIGNMENT_PATTERN = cmp_re(r'{}[=<-]+'.format(match))
+        if FUNCTION_ASSIGNMENT_PATTERN.findall(content):
+            return True
+        return False
 
     def source_here_action(self, match, file_path, folder_path, content):
         dependencies = []
@@ -101,9 +144,27 @@ class R(Language):
         return dependencies
     
     def function_calling_action(self, match, file_path, folder_path, content):
+        print(" function calling depe: "+match)
         dependencies = []
-        file = self.search_file_in_directory(match,folder_path)
+        # first check if the function has declaraion or assignment in the same file
+        if self.check_function_assignment(match,content):
+            return dependencies
+        
+        # secondly check if there is a file with same function name
+        file = self.search_file_in_directory(match)
         if file is not None:
             dependencies.append(file)
+            print(dependencies)
+            return dependencies
+
+        # third look up in the function->file mapping dictionary ** this checking is for all the files and functions
+        file = self.get_file_path_from_function(match)
+        print(file)
+        if file is not None:
+            dependencies.append(file)
+            print("fun_to_file dependencies: ")
+            print(dependencies)
+            dependencies.append(file)
+        
         return dependencies
     
