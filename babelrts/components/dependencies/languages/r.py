@@ -147,8 +147,8 @@ class R(Language):
         print(" function calling depe: "+match)
         dependencies = []
         # first check if the function has declaraion or assignment in the same file
-        if self.check_function_assignment(match,content):
-            return dependencies
+        # if self.check_function_assignment(match,content):
+        #     return dependencies
         
         # secondly check if there is a file with same function name
         file = self.search_file_in_directory(match)
