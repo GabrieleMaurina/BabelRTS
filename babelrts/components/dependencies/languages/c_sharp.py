@@ -7,26 +7,25 @@ from collections import defaultdict
 from os import sep
 
 NAMESPACE_PATTERN = cmp_re(r'\bnamespace\s+(\S+?)\s*[{;]')
-#using has two different declaration: directive and
 USING_DIRECTIVE_PATTERN = cmp_re(r'\busing\s+(\S+?)\s*;')
 INHERIT_PATTERN = cmp_re(r'\bclass\s+(\S+?)\s*\:\s+([\s\S]+?)\s*{')
-NEW_PATTERN = cmp_re(r'\bnew\s+(\S+?)\s*\(\s*')
+NEW_PATTERN = cmp_re(r'=\s\bnew\s+(\S+?)\s*\(\s*')
 
 THROW_PATTERN = cmp_re(r'\bthrow\s+([\s\S]+?)\s*;')
 CATCH_PATTERN = cmp_re(r'\bcatch\s*\(\s*([\s\S]+?)\s*\S+\)')
 
 class CSharp(Language):
 
-
     def __init__(self, dependency_extractor):
         super().__init__(dependency_extractor)
         self._reset()
 
     def get_extensions_patterns_actions(self):
-        return  (
+        return (
             ExtensionPatternAction('cs', NAMESPACE_PATTERN, self.namespace_action),
             ExtensionPatternAction('cs', USING_DIRECTIVE_PATTERN, self.using_action),
             ExtensionPatternAction('cs', INHERIT_PATTERN, self.inherit_action),
+            ExtensionPatternAction('cs', NEW_PATTERN, self.new_action),
         )
 
     @staticmethod
@@ -37,7 +36,7 @@ class CSharp(Language):
         namespaces = match.split('.')
 
         self._dependencies[file_path].add(namespaces[-1])
-        # self._namespaces[namespaces[-1]].add(file_path)
+        self._namespaces[namespaces[-1]].add(file_path)
 
     def using_action(self, match, file_path, folder_path, content):
         head, tail = ntpath.split(self._sourceFolder)
@@ -65,27 +64,23 @@ class CSharp(Language):
         classesInherited = []
 
         for inherited in inheritedClasses:
-            path = self.findPathForClass(inherited, file_path, folder_path)
+            path = self.findPathForClass(inherited)
             if path is not None:
                 classesInherited.append(path)
 
         return classesInherited
 
     def new_action(self, match, file_path, folder_path, content):
-        return 0
+        path = self.findPathForClass(match)
+        return path
 
-    #NOTE: We're going to ignore interfaces. It seems a bit more complicated
+    # NOTE: We're going to ignore interfaces. It seems a bit more complicated
     # to find them via file names. The files themselves have to be read.
-    def findPathForClass(self, className, file_path, folder_path):
+    def findPathForClass(self, className):
         if className[0] != 'I' or className[1].islower():
-            inheritedPath = sep + className + ".cs"
+            if className in self._classesAndPaths:
+                return self._classesAndPaths[className]
 
-            if self.is_file(folder_path + inheritedPath):
-                return folder_path + inheritedPath
-            else:
-                for usingPath in self._using[file_path]:
-                    if self.is_file(usingPath + inheritedPath):
-                        return usingPath + inheritedPath
     def getAllFilesFromFolder(self, pathToScopedFolder):
         files = []
 
@@ -97,16 +92,26 @@ class CSharp(Language):
         return files
 
     def get_additional_dependencies(self):
-            additional_dependencies = defaultdict(set)
-            for file, namespaces in self._dependencies.items():
-                for namespace in namespaces:
-                    additional_dependencies[file].update(self._namespaces[namespace])
-            self._reset()
-            return additional_dependencies
+        additional_dependencies = defaultdict(set)
+        for file, namespaces in self._dependencies.items():
+            for namespace in namespaces:
+                additional_dependencies[file].update(self._namespaces[namespace])
+        self._reset()
+        return additional_dependencies
 
-#NOTE: IS THIS REQUIRED?
+    def assignClassToPath(self):
+        for path in self.get_all_files():
+            head, tail = ntpath.split(path)
+            if tail.endswith(".cs"):
+                self._classesAndPaths[tail[:len(tail) - 3]] = path
+
+    def before(self):
+        self.assignClassToPath()
+
+    # NOTE: IS THIS REQUIRED?
     def _reset(self):
         self._sourceFolder = list(self.get_source_test_folders())[0]
         self._using = defaultdict(set)
+        self._classesAndPaths = defaultdict(set)
         self._dependencies = defaultdict(set)
         self._namespaces = defaultdict(set)
