@@ -75,7 +75,7 @@ class R(Language):
             file = join(folder,match.split("/")[-1])
             #print("folder: + "+folder)
             if self.is_file(file):
-                print("yes: "+file)
+                #print("yes: "+file)
                 return file
         
         return None
@@ -144,7 +144,7 @@ class R(Language):
         return dependencies
     
     def function_calling_action(self, match, file_path, folder_path, content):
-        print(" function calling depe: "+match)
+        #print(" function calling depe: "+match)
         dependencies = []
         # first check if the function has declaraion or assignment in the same file
         # if self.check_function_assignment(match,content):
@@ -159,11 +159,11 @@ class R(Language):
 
         # third look up in the function->file mapping dictionary ** this checking is for all the files and functions
         file = self.get_file_path_from_function(match)
-        print(file)
+        #print(file)
         if file is not None:
             dependencies.append(file)
-            print("fun_to_file dependencies: ")
-            print(dependencies)
+            #print("fun_to_file dependencies: ")
+            #print(dependencies)
             dependencies.append(file)
         
         return dependencies
