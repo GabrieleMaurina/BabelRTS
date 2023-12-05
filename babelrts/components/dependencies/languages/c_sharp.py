@@ -11,8 +11,8 @@ USING_DIRECTIVE_PATTERN = cmp_re(r'\busing\s+(\S+?)\s*;')
 INHERIT_PATTERN = cmp_re(r'\bclass\s+(\S+?)\s*\:\s+([\s\S]+?)\s*{')
 NEW_PATTERN = cmp_re(r'=\s\bnew\s+(\S+?)\s*\(\s*')
 
-THROW_PATTERN = cmp_re(r'\bthrow\s+([\s\S]+?)\s*;')
-CATCH_PATTERN = cmp_re(r'\bcatch\s*\(\s*([\s\S]+?)\s*\S+\)')
+THROW_PATTERN = cmp_re(r'\bthrow new\s+(\S+?)\s*\(\s*')
+CATCH_PATTERN = cmp_re(r'\bcatch\s*\(\s*(\w+)\s*\)')
 
 class CSharp(Language):
 
@@ -26,6 +26,8 @@ class CSharp(Language):
             ExtensionPatternAction('cs', USING_DIRECTIVE_PATTERN, self.using_action),
             ExtensionPatternAction('cs', INHERIT_PATTERN, self.inherit_action),
             ExtensionPatternAction('cs', NEW_PATTERN, self.new_action),
+            ExtensionPatternAction('cs', THROW_PATTERN, self.throw_action),
+            ExtensionPatternAction('cs', CATCH_PATTERN, self.catch_action),
         )
 
     @staticmethod
@@ -74,6 +76,14 @@ class CSharp(Language):
         path = self.findPathForClass(match)
         return path
 
+    def throw_action(self, match, file_path, folder_path, content):
+        path = self.findPathForClass(match)
+        return path
+
+    def catch_action(self, match, file_path, folder_path, content):
+        path = self.findPathForClass(match)
+        return path
+
     # NOTE: We're going to ignore interfaces. It seems a bit more complicated
     # to find them via file names. The files themselves have to be read.
     def findPathForClass(self, className):
@@ -108,7 +118,6 @@ class CSharp(Language):
     def before(self):
         self.assignClassToPath()
 
-    # NOTE: IS THIS REQUIRED?
     def _reset(self):
         self._sourceFolder = list(self.get_source_test_folders())[0]
         self._using = defaultdict(set)
