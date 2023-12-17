@@ -13,25 +13,19 @@ SOURCE_PATTERN = cmp_re(r'\bsource\s*\(["\']([A-Za-z0-9-_.\/]+\.[Rr])["\']\)')
 # dependency in test file like source(here::here('code/example.R'))
 SOURCE_HERE_PATTERN = cmp_re(r'\bsource\s*\([A-Za-z:]*\(["\']([A-Za-z0-9-_.]*\/[A-Za-z0-9-_.]+\.[Rr])["\']\)\)')
 
-# Dependency in gloabl scope like calling sum() from A.R file inside B.R without any imports
-# for such cases, we need to look inside NAMESPACE for possible match of file name corresponding to that function sum()
-
-#FUNCTION_CALLING_PATTERN = cmp_re(r'\b([A-Za-z0-9-_.]+)\s*\(')
-
 KEYWORDS = ['if','else','function','return','class','source','context','for','while','next','c','print','sum','min',
             'max','str','length','mean','library','package','test_that','list','tryCatch','expect_equal','expect_true',
             'expect_false','exists','ncol','range','abs','sqrt','round','ceiling','floor','substr']
 
-# excludig the common keywords / built in functions 
+# Dependency in gloabl scope like calling sum() from A.R file inside B.R without any imports
+# excludig the common keywords or built in functions from pattern matching
 FUNCTION_CALLING_PATTERN = cmp_re(r'\b(?!{})([A-Za-z0-9-_.]+)\s*\('.format('|'.join(KEYWORDS)))
 
 # sum = function() or sum <- function()
 FUNCTION_DECLARATION_PATTERN = cmp_re(r'\b([A-Za-z0-9-_.]+)\s*[=<-]+\s*function\s*\(')
 
 
-
 class R(Language):
-    
 
     def get_extensions_patterns_actions(self):
         self.function_to_file_map = self.make_all_function_to_file_mapping()
@@ -49,14 +43,7 @@ class R(Language):
         return False
     
     def chek_and_make_file_path(self,match,folder_path):
-        # from src file
-        #folder_path: ../data_analysis_1/R
-        #match: '09_generate_report.R'
-        
-        #from test file
-        #folder_path: ../data_analysis_1/tests
-        #match: '../R/09_generate_report.R'
-       
+    
         # if match has only file name (possible for src->src dependencies) then join folder name and file name 
         if len(match.split("/"))<2:
             file=  join(folder_path,match)
@@ -73,7 +60,6 @@ class R(Language):
         # check if the file is available inside any other folder
         for folder in self.get_folders(folder_path):
             file = join(folder,match.split("/")[-1])
-            #print("folder: + "+folder)
             if self.is_file(file):
                 #print("yes: "+file)
                 return file
@@ -88,22 +74,14 @@ class R(Language):
         
     
     def make_all_function_to_file_mapping(self):
-        #src_folder = next(self.get_source_test_folders())
-        # print("src_folder: "+src_folder)
         func_to_file = {}
 
         for folder in self.get_source_test_folders():
             for file in self.expand(join(folder, '*.R')):
-                #print(file)
-                #print(folder)
                 content = self.file_read(file)
                 for match in FUNCTION_DECLARATION_PATTERN.findall(content):
                     func_to_file[match] = file
-            
-            # break: only worked on first (src) folder 
             break
-        
-        #print(func_to_file)
         return func_to_file
 
     def get_file_path_from_function(self,match):
@@ -146,24 +124,21 @@ class R(Language):
     def function_calling_action(self, match, file_path, folder_path, content):
         #print(" function calling depe: "+match)
         dependencies = []
-        # first check if the function has declaraion or assignment in the same file
-        # if self.check_function_assignment(match,content):
-        #     return dependencies
+        #first check if the function has declaraion or assignment in the same file
+        if self.check_function_assignment(match,content):
+            return dependencies
         
         # secondly check if there is a file with same function name
-        # file = self.search_file_in_directory(match)
-        # if file is not None:
-        #     dependencies.append(file)
-        #     print(dependencies)
-        #     return dependencies
+        file = self.search_file_in_directory(match)
+        if file is not None:
+            dependencies.append(file)
+            return dependencies
 
         # third look up in the function->file mapping dictionary ** this checking is for all the files and functions
         file = self.get_file_path_from_function(match)
         #print(file)
         if file is not None:
             dependencies.append(file)
-            #print("fun_to_file dependencies: ")
-            #print(dependencies)
             dependencies.append(file)
         
         return dependencies
