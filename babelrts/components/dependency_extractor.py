@@ -59,6 +59,7 @@ class DependencyExtractor:
         self._dependency_graph = None
 
     def generate_dependency_graph(self):
+        self._before()
         all_files = self.get_babelrts().get_change_discoverer().get_all_files()
         extensions = self.get_extensions()
         patterns_actions = self.get_patterns_actions()
@@ -74,7 +75,16 @@ class DependencyExtractor:
                     self._collect_dependencies(file_path, folder_path, project_folder, patterns_actions, extension, dependency_graph)
         self._add_additional_dependencies(dependency_graph, project_folder)
         self.set_dependency_graph(dict(dependency_graph))
+        self._after()
         return self.get_dependency_graph()
+
+    def _before(self):
+        for language_implementation_object in self.get_language_implementation_objects():
+            language_implementation_object.before()
+
+    def _after(self):
+        for language_implementation_object in self.get_language_implementation_objects():
+            language_implementation_object.after()
 
     def safe_read(self, file):
         try:

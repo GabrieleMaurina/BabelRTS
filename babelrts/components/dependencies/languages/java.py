@@ -2,8 +2,8 @@ from babelrts.components.dependencies.language import Language
 from babelrts.components.dependencies.extension_pattern_action import ExtensionPatternAction
 
 from re import compile as cmp_re
-from os.path import join, relpath, normpath
 from os import sep
+from pygtrie import StringTrie
 
 IMPORT_PATTERN = cmp_re(r'\bimport\s+(\S+)\s*;')
 IMPORT_STATIC_PATTERN = cmp_re(r'\bimport\s+static\s+(\S+)\s*;')
@@ -11,10 +11,10 @@ PACKAGE_PATTERN = cmp_re(r'\bpackage\s+(\S+)\s*;')
 EXTENDS_PATTERN = cmp_re(r'\bextends\s+([\s\S]+?)\s*(?:{|implements)')
 IMPLEMENTS_PATTERN = cmp_re(r'\bimplements\s+([\s\S]+?)\s*(?:{|extends)')
 NEW_PATTERN = cmp_re(r'\bnew\s+(\S+?)\s*\(\s*')
-STATIC_PATTERN = cmp_re(r'\b([A-Z]\S+?)\.')
-ANNOTATION_PATTERN = cmp_re(r'(?<!\S)@(\S+)(?:\s*\()?')
-THROWS_PATTERN = cmp_re(r'\bthrows\s+([\s\S]+?)\s*{')
-CATCH_PATTERN = cmp_re(r'\bcatch\s*\(\s*([\s\S]+?)\s*\S+\)')
+STATIC_PATTERN = cmp_re(r'\b((?:[a-z0-9_\.]+\.)?[A-Z][A-Za-z0-9_]+?)\.[A-Za-z_]')
+ANNOTATION_PATTERN = cmp_re(r'(?<!\S)@(\w+)')
+THROWS_PATTERN = cmp_re(r'\bthrows\s+([A-Za-z_\., ]+?)\s*{')
+CATCH_PATTERN = cmp_re(r'\bcatch\s*\(\s*([A-Za-z_\.| ]+?)\s*\S+\)')
 
 SPLIT = cmp_re(r',|\||\n')
 SPLIT_PATH = cmp_re(r'\\|\/')
@@ -39,50 +39,55 @@ class Java(Language):
         return 'java'
 
     def import_action(self, match, file_path, folder_path, content):
+        multiple = False
         if match.endswith('*'):
-            path = match.replace('.', '/') + '.java'
-            return (file for folder in self.get_source_test_folders() for file in self.expand(join(folder, path)))
-        else:
-            return self.class_to_files(match, folder_path)
+            match = match[:-2]
+            multiple = True
+        return self.class_to_files(match, file_path, multiple, False)
 
     def import_static_action(self, match, file_path, folder_path, content):
         match = match.rsplit('.', 1)[0]
-        return self.class_to_files(match, folder_path)
+        return self.class_to_files(match, file_path)
 
     def package_action(self, match, file_path, folder_path, content):
-        return (file for folder in self.get_source_test_folders() for file in self.expand(join(folder_path, '*.java')))
+        return self.class_to_files(match, file_path)
 
     def used_class_action(self, match, file_path, folder_path, content):
-        return self.class_to_files(match, folder_path)
+        return self.class_to_files(match, file_path)
 
     def multiple_used_classes_action(self, match, file_path, folder_path, content):
         clazzes = (clazz for clazz in (v.strip() for v in SPLIT.split(match)) if clazz)
-        return (file for clazz in clazzes for file in self.class_to_files(clazz, folder_path))
+        return (file for clazz in clazzes for file in self.class_to_files(clazz, file_path))
+    
+    def get_files_for_class(self, clazz, multiple):
+        if multiple and self.classes.has_subtrie(clazz):
+            return tuple(file for files in self.classes[clazz:] for file in files)
+        elif not multiple and clazz in self.classes:
+            return tuple(self.classes[clazz])
+        return ()
 
-    def fix_path(self, path):
-        tokens = SPLIT_PATH.split(normpath(path))
-        tokens = (v.strip() for v in tokens)
-        tokens = (v for v in tokens if v)
-        return sep.join(tokens)
+    def class_to_files(self, clazz, file_path, multiple=False, allow_package=True):
+        files = self.get_files_for_class(clazz, multiple)
+        if allow_package and not files:
+            package = self.packages[file_path]
+            package_class = f'{package}.{clazz}'
+            files = self.get_files_for_class(package_class, multiple)
+        return files
 
-    def get_package_path(self, folder):
-        folder = self.fix_path(folder)
-        for path in self.get_source_test_folders():
-            path = self.fix_path(path) + sep
-            if folder.startswith(path):
-                return relpath(folder, path)
-
-    def class_to_files(self, clazz, folder_path):
-        class_path = clazz.replace('.', sep) + '.java'
-        package_path = self.get_package_path(folder_path)
-
-        if package_path:
-            packages = ('', package_path)
-        else:
-            packages = ('',)
-
-        folders = self.get_source_test_folders()
-
-        paths = (join(folder, package, class_path) for folder in folders for package in packages)
-
-        return (path for path in paths if self.is_file(path))
+    def before(self):
+        self.classes = StringTrie(separator='.')
+        self.packages = {}
+        folders = tuple(self.get_source_test_folders())
+        files = self.get_all_files()
+        for file in files:
+            clazz = self._find_clazz(file, folders)
+            if clazz in self.classes:
+                self.classes[clazz].append(file)
+            else:
+                self.classes[clazz] = [file]
+            self.packages[file] = clazz.rsplit('.', 1)[0]
+    
+    def _find_clazz(self, file, folders):
+        size = max([len(folder) for folder in folders if file.startswith(folder)])
+        clazz = file[size + 1:-5].replace(sep, '.')
+        return clazz

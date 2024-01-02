@@ -10,6 +10,12 @@ class Language(ABC):
     def __init__(self, dependency_extractor):
         self._dependency_extractor = dependency_extractor
 
+    def before(self):
+        pass
+
+    def after(self):
+        pass
+
     def is_file(self, path):
         return isfile(join(self.get_project_folder(), normpath(path)))
 
@@ -54,3 +60,6 @@ class Language(ABC):
 
     def set_dependency_extractor(self, dependency_extractor):
         self._dependency_extractor = dependency_extractor
+
+    def get_all_files(self):
+        return self.get_dependency_extractor().get_babelrts().get_change_discoverer().get_all_files()
