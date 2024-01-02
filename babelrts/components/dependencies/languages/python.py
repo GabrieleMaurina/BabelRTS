@@ -54,4 +54,5 @@ class Python(Language):
                     dependencies += files
             return dependencies
         else:
-            return self.import_dependencies(self.check_relative_import(match[1], folder_path))
+            dependencies = self.import_dependencies(self.check_relative_import(match[1], folder_path))
+            return dependencies
