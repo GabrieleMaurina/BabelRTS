@@ -8,10 +8,10 @@ from os.path import join, normpath, sep
 # retrunr only the file  name like A1.R, file09.a.r
 
 # dependency in source file or test file like  source("../code/A1.R")
-SOURCE_PATTERN = cmp_re(r'\bsource\s*\(["\']([A-Za-z0-9-_.\/]+\.[Rr])["\']\)')
+SOURCE_PATTERN = cmp_re(r'\bsource\s*\(["\']([A-Za-z0-9-_.\/]+\.[R])["\']\)')
 
 # dependency in test file like source(here::here('code/example.R'))
-SOURCE_HERE_PATTERN = cmp_re(r'\bsource\s*\([A-Za-z:]*\(["\']([A-Za-z0-9-_.]*\/[A-Za-z0-9-_.]+\.[Rr])["\']\)\)')
+SOURCE_HERE_PATTERN = cmp_re(r'\bsource\s*\([A-Za-z:]*\(["\']([A-Za-z0-9-_.]*\/[A-Za-z0-9-_.]+\.[R])["\']\)\)')
 
 KEYWORDS = ['if','else','function','return','class','source','context','for','while','next','c','print','sum','min',
             'max','str','length','mean','library','package','test_that','list','tryCatch','expect_equal','expect_true',
@@ -28,12 +28,15 @@ FUNCTION_DECLARATION_PATTERN = cmp_re(r'\b([A-Za-z0-9-_.]+)\s*[=<-]+\s*function\
 class R(Language):
 
     def get_extensions_patterns_actions(self):
-        self.function_to_file_map = self.make_all_function_to_file_mapping()
         return (ExtensionPatternAction('R', SOURCE_PATTERN, self.source_action),
                 ExtensionPatternAction('R', SOURCE_HERE_PATTERN, self.source_here_action),
                 ExtensionPatternAction('R', FUNCTION_CALLING_PATTERN, self.function_calling_action))
 
     @staticmethod
+
+    def before(self):
+        self.function_to_file_map = self.make_all_function_to_file_mapping()
+
     def get_language():
         return 'r'
     
