@@ -42,21 +42,21 @@ from babelrts.components.dependencies.languages.typescript import Typescript
 from babelrts.components.dependencies.languages.visual_basic import VisualBasic
 
 from collections import defaultdict
-from collections.abc import Iterable
 from os.path import join, relpath, normpath, isabs, basename, dirname
 from graphviz import Digraph
 
 LANGUAGE_IMPLEMENTATIONS = (Ada, Asp, AutoHotkey, AutoIt, C, CSharp, Cobol, Cobra,
-    Cpp, D, Dart, Erlang, Fortran, Go, Groovy, Haskell, Java, Javascript, JRuby,
-    Kotlin, Lua, MatLab, ObjectiveC, Ocaml, Pascal, Pearl, Php, Prolog, Python, R,
-    Red, Ruby, Rust, Scala, StandardML, SwiProlog, Swift, Typescript, VisualBasic)
+                            Cpp, D, Dart, Erlang, Fortran, Go, Groovy, Haskell, Java, Javascript, JRuby,
+                            Kotlin, Lua, MatLab, ObjectiveC, Ocaml, Pascal, Pearl, Php, Prolog, Python, R,
+                            Red, Ruby, Rust, Scala, StandardML, SwiProlog, Swift, Typescript, VisualBasic)
+
 
 class DependencyExtractor:
 
     def __init__(self, babelrts, languages=None, language_implementations=None):
         self.set_babelrts(babelrts)
         self.set_languages(languages, language_implementations)
-        self._dependency_graph = None
+        self._dependencies = None
 
     def generate_dependency_graph(self):
         self._before()
@@ -72,11 +72,12 @@ class DependencyExtractor:
             if len(split) == 2:
                 name, extension = split
                 if name and extension and extension in extensions:
-                    self._collect_dependencies(file_path, folder_path, project_folder, patterns_actions, extension, dependency_graph)
+                    self._collect_dependencies(
+                        file_path, folder_path, project_folder, patterns_actions, extension, dependency_graph)
         self._add_additional_dependencies(dependency_graph, project_folder)
-        self.set_dependency_graph(dict(dependency_graph))
+        self.set_dependencies(dict(dependency_graph))
         self._after()
-        return self.get_dependency_graph()
+        return self.get_dependencies()
 
     def _before(self):
         for language_implementation_object in self.get_language_implementation_objects():
@@ -105,7 +106,8 @@ class DependencyExtractor:
         content = self.safe_read(full_path)
         for pattern, action in patterns_actions[extension]:
             for match in pattern.findall(content):
-                new_dependencies = action(match, file_path, folder_path, content)
+                new_dependencies = action(
+                    match, file_path, folder_path, content)
                 if new_dependencies:
                     if isinstance(new_dependencies, str):
                         new_dependencies = (new_dependencies,)
@@ -133,13 +135,13 @@ class DependencyExtractor:
                         if dependency != file:
                             dependency_graph[file].add(dependency)
 
-    def get_dependency_graph(self):
-        if self._dependency_graph is None:
+    def get_dependencies(self):
+        if self._dependencies is None:
             self.generate_dependency_graph()
-        return self._dependency_graph
+        return self._dependencies
 
-    def set_dependency_graph(self, dependency_graph):
-        self._dependency_graph = dependency_graph
+    def set_dependencies(self, dependencies):
+        self._dependencies = dependencies
 
     def get_babelrts(self):
         return self._babelrts
@@ -162,7 +164,8 @@ class DependencyExtractor:
     def set_languages(self, languages=None, language_implementations=None):
         if not language_implementations:
             language_implementations = LANGUAGE_IMPLEMENTATIONS
-        self._language_implementations = {language_implementation.get_language():language_implementation for language_implementation in language_implementations}
+        self._language_implementations = {language_implementation.get_language(
+        ): language_implementation for language_implementation in language_implementations}
 
         if not languages:
             languages = self._language_implementations.keys()
@@ -173,18 +176,21 @@ class DependencyExtractor:
         self._patterns_actions = {}
         self._language_implementation_objects = []
         for language in languages:
-            self._add_language_implementation(self._language_implementations[language.lower()])
+            self._add_language_implementation(
+                self._language_implementations[language.lower()])
 
     def _add_language_implementation(self, language_implementation):
         language_implementation_object = language_implementation(self)
-        self._language_implementation_objects.append(language_implementation_object)
+        self._language_implementation_objects.append(
+            language_implementation_object)
         extensions_patterns_actions = language_implementation_object.get_extensions_patterns_actions()
         if extensions_patterns_actions:
             if isinstance(extensions_patterns_actions, ExtensionPatternAction):
                 self._add_extension_pattern_action(extensions_patterns_actions)
             else:
                 for extension_pattern_action in extensions_patterns_actions:
-                    self._add_extension_pattern_action(extension_pattern_action)
+                    self._add_extension_pattern_action(
+                        extension_pattern_action)
 
     def _add_extension_pattern_action(self, extension_pattern_action):
         extension = extension_pattern_action.extension
@@ -221,13 +227,13 @@ class DependencyExtractor:
 
     def generate_digraph(self, short_names=True):
         g = Digraph()
-        for f1, dependencies in self.get_dependency_graph().items():
-            f1 = f1.replace('\\','/')
+        for f1, dependencies in self.get_dependencies().items():
+            f1 = f1.replace('\\', '/')
             if short_names:
                 f1 = basename(f1)
             g.node(f1)
             for f2 in dependencies:
-                f2 = f2.replace('\\','/')
+                f2 = f2.replace('\\', '/')
                 if short_names:
                     f2 = basename(f2)
                 g.edge(f1, f2)

@@ -5,6 +5,7 @@ from os.path import join, isfile, isdir, relpath, normpath
 from glob import glob
 from itertools import chain
 
+
 class Language(ABC):
 
     def __init__(self, dependency_extractor):
@@ -44,8 +45,8 @@ class Language(ABC):
 
     def get_source_test_folders(self):
         babelrts = self.get_dependency_extractor().get_babelrts()
-        source_folders = babelrts.get_source_folders()
-        test_folders = babelrts.get_test_folders()
+        source_folders = babelrts.get_sources()
+        test_folders = babelrts.get_tests()
         return chain(source_folders, test_folders)
 
     def get_folders(self, folders=()):

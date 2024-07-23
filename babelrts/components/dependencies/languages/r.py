@@ -40,7 +40,8 @@ class R(Language):
     def before(self):
         self.function_to_file_map = self.make_all_function_to_file_mapping()
 
-    def get_language(self):
+    @staticmethod
+    def get_language():
         return 'r'
 
     def is_r_keyword(self, word):
