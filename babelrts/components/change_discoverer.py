@@ -23,6 +23,7 @@ class ChangeDiscoverer:
         self._init_excluded()
         self._init_test_files()
         self._init_source_files()
+        self._check_test_regexp()
 
         self.set_all_files(self.get_test_files() | self.get_source_files())
 
@@ -166,6 +167,17 @@ class ChangeDiscoverer:
 
     def set_test_files(self, test_files):
         self._test_files = test_files
+
+    def _check_test_regexp(self):
+        test_regexp = self.get_babelrts().get_test_regexp()
+        if test_regexp is not None:
+            not_tests = []
+            for test in self.get_test_files():
+                if not test_regexp.match(test):
+                    not_tests.append(test)
+            for not_test in not_tests:
+                self.get_test_files().remove(not_test)
+                self.get_source_files().add(not_test)
 
     def get_changed_files(self):
         return self._changed_files

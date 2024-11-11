@@ -1,6 +1,7 @@
 import babelrts.components
 
 from os.path import normpath
+import re
 
 __author__ = 'Gabriele Maurina'
 __copyright__ = '© 2020-2024 Gabriele Maurina'
@@ -14,13 +15,14 @@ __status__ = 'Production'
 
 class BabelRTS:
 
-    def __init__(self, project_folder='.', sources=None, tests=None, excluded=(), languages=None, language_implementations=None, commit=None):
+    def __init__(self, project_folder='.', sources=None, tests=None, excluded=(), languages=None, language_implementations=None, commit=None, test_regexp=None):
         self.set_project_folder(project_folder)
         self.set_sources(sources)
         self.set_tests(tests)
         self.set_excluded(excluded)
         self.set_languages(languages)
         self.set_commit(commit)
+        self.set_test_regexp(test_regexp)
         self.set_change_discoverer(
             babelrts.components.change_discoverer.ChangeDiscoverer(self))
         self.set_dependency_extractor(babelrts.components.dependency_extractor.DependencyExtractor(
@@ -97,6 +99,15 @@ class BabelRTS:
 
     def get_commit(self):
         return self._commit
+
+    def set_test_regexp(self, test_regexp):
+        if not test_regexp:
+            self._test_regexp = None
+        else:
+            self._test_regexp = re.compile(test_regexp)
+
+    def get_test_regexp(self):
+        return self._test_regexp
 
     def get_change_discoverer(self):
         return self._change_discoverer
