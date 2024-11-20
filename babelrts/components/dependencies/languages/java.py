@@ -61,7 +61,8 @@ class Java(Language):
     
     def get_files_for_class(self, clazz, multiple):
         if multiple and self.classes.has_subtrie(clazz):
-            return tuple(file for files in self.classes[clazz:] for file in files)
+            tokens = len(clazz.split('.'))
+            return tuple(file for k, files in self.classes.iteritems(clazz) for file in files if len(k.split('.')) == tokens + 1)
         elif not multiple and clazz in self.classes:
             return tuple(self.classes[clazz])
         return ()

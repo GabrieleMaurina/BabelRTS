@@ -4,8 +4,7 @@ from argparse import ArgumentParser
 
 
 def parse_args():
-    description = f'BabelRTS v{
-        __version__}. BabelRTS is a regression test selection tool. Given a codebase that has changed, BabelRTS selects modification traversing tests. Find out more at https://github.com/GabrieleMaurina/BabelRTS'
+    description = f'BabelRTS v{__version__}. BabelRTS is a regression test selection tool. Given a codebase that has changed, BabelRTS selects modification traversing tests. Find out more at https://github.com/GabrieleMaurina/BabelRTS'
     parser = ArgumentParser(prog='python -m babelrts', description=description)
     parser.add_argument('-p', metavar='<project folder>',
                         default='', help='set project folder (default cwd)')
@@ -14,7 +13,7 @@ def parse_args():
     parser.add_argument('-t', metavar='<test folder>', nargs='+',
                         default=[''], help='select test file or folders (default <project folder>)')
     parser.add_argument('-e', metavar='<excluded>', nargs='+',
-                        default=[''], help='exclude files or folders')
+                        default=[], help='exclude files or folders')
     parser.add_argument('-l', metavar='<languages>', nargs='+',
                         help='select target languages (default all)')
     parser.add_argument('-a', action='store_true', help='select all tests')
