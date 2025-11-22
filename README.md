@@ -24,3 +24,7 @@ https://github.com/GabrieleMaurina/BabelRTS_Evaluation
 
 The replication package included in the paper is available here:
 https://doi.org/10.5281/zenodo.14627004
+
+### Demo
+Here is an example of integrading BabelRTS directly into the CI pipeline in GitHub:
+https://github.com/GabrieleMaurina/BabelRTS_CI
