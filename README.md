@@ -19,10 +19,10 @@ The paper is available here:
 https://ieeexplore.ieee.org/document/10944548
 
 ### Evaluation
-The evaluation scripts for this tool is availabe at this repository:
+The evaluation scripts for BabelRTS are availabe at this repository:
 https://github.com/GabrieleMaurina/BabelRTS_Evaluation
 
-The replication package included in the paper is available here:
+The original replication package included in the paper is available here:
 https://doi.org/10.5281/zenodo.14627004
 
 ### Demo
