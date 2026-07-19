@@ -36,7 +36,6 @@ class R(Language):
                     'R', SOURCE_HERE_PATTERN, self.source_here_action),
                 ExtensionPatternAction('R', FUNCTION_CALLING_PATTERN, self.function_calling_action))
 
-    @staticmethod
     def before(self):
         self.function_to_file_map = self.make_all_function_to_file_mapping()
 
