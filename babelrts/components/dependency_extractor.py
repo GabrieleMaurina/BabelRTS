@@ -99,7 +99,8 @@ class DependencyExtractor:
                         return content.read()
                 except Exception:
                     pass
-        raise UnicodeError(f'Unable to read {file}')
+        with open(file, 'r', errors='ignore') as content:
+            return content.read()
 
     def _collect_dependencies(self, file_path, folder_path, project_folder, patterns_actions, extension, dependency_graph):
         full_path = join(project_folder, file_path)
