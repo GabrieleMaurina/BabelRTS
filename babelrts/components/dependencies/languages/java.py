@@ -101,7 +101,7 @@ class Java(Language):
             self.packages[file] = clazz.rsplit('.', 1)[0]
 
     def _find_clazz(self, file, folders):
-        size = max([len(folder)
-                   for folder in folders if file.startswith(folder)])
+        size = max((len(folder)
+                   for folder in folders if file.startswith(folder)), default=0)
         clazz = file[size + 1:-5].replace(sep, '.')
         return clazz
